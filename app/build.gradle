@@ -1,5 +1,8 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.ksp) apply false
 }
 
 android {
@@ -35,6 +38,14 @@ android {
     buildFeatures {
         viewBinding true
     }
+
+    kotlin {
+        compilerOptions {
+            languageVersion = KotlinVersion.KOTLIN_2_0
+            // Optional: Set jvmTarget
+            // jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11
+        }
+    }
 }
 
 dependencies {
@@ -45,6 +56,8 @@ dependencies {
     implementation libs.navigation.fragment
     implementation libs.navigation.ui
     implementation libs.recyclerview
+    implementation libs.room
+    annotationProcessor libs.room.compiler
     testImplementation libs.junit
     androidTestImplementation libs.espresso.core
     androidTestImplementation libs.ext.junit
