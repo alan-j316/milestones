@@ -24,9 +24,9 @@ import com.cs360.weighttracker.components.AddWeightDialog;
 import com.cs360.weighttracker.components.DeleteWeightItemDialog;
 import com.cs360.weighttracker.components.WeightItemAdapter;
 import com.cs360.weighttracker.database.MilestoneRepository;
-import com.cs360.weighttracker.models.DailyWeight;
-import com.cs360.weighttracker.models.GoalType;
-import com.cs360.weighttracker.models.User;
+import com.cs360.weighttracker.domain.models.DailyWeight;
+import com.cs360.weighttracker.domain.models.GoalType;
+import com.cs360.weighttracker.domain.models.User;
 import com.cs360.weighttracker.utils.TimeUtils;
 
 import java.util.List;

@@ -8,7 +8,7 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cs360.weighttracker.R;
-import com.cs360.weighttracker.models.DailyWeight;
+import com.cs360.weighttracker.domain.models.DailyWeight;
 import com.cs360.weighttracker.utils.DateFormatter;
 import com.cs360.weighttracker.utils.WeightFormatter;
 

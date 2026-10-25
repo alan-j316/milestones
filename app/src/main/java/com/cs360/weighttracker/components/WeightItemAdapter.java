@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.cs360.weighttracker.models.DailyWeight;
+import com.cs360.weighttracker.domain.models.DailyWeight;
 
 import java.util.List;
 

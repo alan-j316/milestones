@@ -7,8 +7,8 @@ import androidx.annotation.NonNull;
 
 import com.cs360.weighttracker.database.status.LoginStatus;
 import com.cs360.weighttracker.database.status.RegisterStatus;
-import com.cs360.weighttracker.models.DailyWeight;
-import com.cs360.weighttracker.models.User;
+import com.cs360.weighttracker.domain.models.DailyWeight;
+import com.cs360.weighttracker.domain.models.User;
 import com.cs360.weighttracker.utils.LogCategory;
 import com.cs360.weighttracker.utils.PasswordHasher;
 

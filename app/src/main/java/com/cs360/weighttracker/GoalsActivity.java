@@ -19,7 +19,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.cs360.weighttracker.database.MilestoneRepository;
-import com.cs360.weighttracker.models.User;
+import com.cs360.weighttracker.domain.models.User;
 import com.cs360.weighttracker.validators.WeightValidator;
 
 public class GoalsActivity extends AppCompatActivity {

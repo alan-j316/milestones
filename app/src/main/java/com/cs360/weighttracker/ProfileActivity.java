@@ -25,9 +25,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.cs360.weighttracker.database.MilestoneRepository;
-import com.cs360.weighttracker.models.DailyWeight;
-import com.cs360.weighttracker.models.GoalType;
-import com.cs360.weighttracker.models.User;
+import com.cs360.weighttracker.domain.models.DailyWeight;
+import com.cs360.weighttracker.domain.models.GoalType;
+import com.cs360.weighttracker.domain.models.User;
 import com.cs360.weighttracker.validators.PhoneNumberValidator;
 
 public class ProfileActivity extends AppCompatActivity {

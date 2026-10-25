@@ -1,4 +1,4 @@
-package com.cs360.weighttracker.models
+package com.cs360.weighttracker.domain.models
 
 /**
  * User's daily weight.
