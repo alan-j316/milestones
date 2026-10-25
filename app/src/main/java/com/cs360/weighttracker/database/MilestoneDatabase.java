@@ -10,7 +10,6 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.cs360.weighttracker.models.DailyWeight;
-import com.cs360.weighttracker.models.GoalWeight;
 import com.cs360.weighttracker.models.User;
 import com.cs360.weighttracker.utils.LogCategory;
 
@@ -132,14 +131,14 @@ public class MilestoneDatabase extends SQLiteOpenHelper {
         // Get the user if there exists a user with same id
         User retrievedUser = getUser(user.getUserName());
         if (retrievedUser != null)
-            return user.getUserId();
+            return user.userId;
 
         // Create values for insertion
         ContentValues values = new ContentValues();
         values.put(UserTable.COL_USERNAME, user.getUserName());
-        values.put(UserTable.COL_FULL_NAME, user.getFullName());
-        values.put(UserTable.COL_PASSWORD_HASH, user.getHashedPassword());
-        values.put(UserTable.COL_PHONE_NUMBER, user.getPhoneNumber());
+        values.put(UserTable.COL_FULL_NAME, user.fullName);
+        values.put(UserTable.COL_PASSWORD_HASH, user.hashedPassword);
+        values.put(UserTable.COL_PHONE_NUMBER, user.phoneNumber);
 
         // Insert the value into database
         return db.insert(UserTable.TABLE, null, values);
@@ -209,7 +208,7 @@ public class MilestoneDatabase extends SQLiteOpenHelper {
 
         // Execute the query
         String query = "SELECT * FROM " + UserTable.TABLE + " WHERE " + UserTable.COL_USERNAME + " = ? AND " + UserTable.COL_PASSWORD_HASH + " = ?";
-        try (Cursor cursor = db.rawQuery(query, new String[]{user.getUserName(), user.getHashedPassword()})) {
+        try (Cursor cursor = db.rawQuery(query, new String[]{user.getUserName(), user.hashedPassword})) {
             // Get the user if they exist in the database
             if (cursor.moveToFirst()) {
                 long id = cursor.getLong(0);
@@ -239,11 +238,11 @@ public class MilestoneDatabase extends SQLiteOpenHelper {
 
         ContentValues values = new ContentValues();
         values.put(UserTable.COL_USERNAME, user.getUserName());
-        values.put(UserTable.COL_FULL_NAME, user.getFullName());
-        values.put(UserTable.COL_PASSWORD_HASH, user.getHashedPassword());
-        values.put(UserTable.COL_PHONE_NUMBER, user.getPhoneNumber());
+        values.put(UserTable.COL_FULL_NAME, user.fullName);
+        values.put(UserTable.COL_PASSWORD_HASH, user.hashedPassword);
+        values.put(UserTable.COL_PHONE_NUMBER, user.phoneNumber);
 
-        int rowsUpdated = db.update(UserTable.TABLE, values, UserTable.COL_ID + " = ?", new String[]{String.valueOf(user.getUserId())});
+        int rowsUpdated = db.update(UserTable.TABLE, values, UserTable.COL_ID + " = ?", new String[]{String.valueOf(user.userId)});
 
         return rowsUpdated > 0;
     }
@@ -417,7 +416,7 @@ public class MilestoneDatabase extends SQLiteOpenHelper {
 
         // Create the values for insertion
         ContentValues values = new ContentValues();
-        values.put(DailyWeightTable.COL_WEIGHT, dailyWeight.getUserWeight());
+        values.put(DailyWeightTable.COL_WEIGHT, dailyWeight.userWeight);
         values.put(DailyWeightTable.COL_DATE, dailyWeight.getDateTimeMillis());
         values.put(DailyWeightTable.USER_FK, userId);
 
@@ -490,10 +489,10 @@ public class MilestoneDatabase extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(DailyWeightTable.COL_WEIGHT, dailyWeight.getUserWeight());
+        values.put(DailyWeightTable.COL_WEIGHT, dailyWeight.userWeight);
         values.put(DailyWeightTable.COL_DATE, dailyWeight.getDateTimeMillis());
 
-        int rowsUpdated = db.update(DailyWeightTable.TABLE, values, DailyWeightTable.COL_ID + " = ?", new String[]{String.valueOf(dailyWeight.getId())});
+        int rowsUpdated = db.update(DailyWeightTable.TABLE, values, DailyWeightTable.COL_ID + " = ?", new String[]{String.valueOf(dailyWeight.id)});
 
         return rowsUpdated > 0;
     }

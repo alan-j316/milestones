@@ -32,7 +32,7 @@ public class WeightItemAdapter extends RecyclerView.Adapter<WeightItemViewHolder
         // Get the at the position index and bind it to the view holder
         DailyWeight weight = dailyWeights.get(position);
         holder.bind(weight, this.onDeleteWeightListener);
-        holder.itemView.setTag(weight.getId());
+        holder.itemView.setTag(weight.id);
     }
 
     /**

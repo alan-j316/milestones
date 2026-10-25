@@ -8,7 +8,6 @@ import androidx.annotation.NonNull;
 import com.cs360.weighttracker.database.status.LoginStatus;
 import com.cs360.weighttracker.database.status.RegisterStatus;
 import com.cs360.weighttracker.models.DailyWeight;
-import com.cs360.weighttracker.models.GoalWeight;
 import com.cs360.weighttracker.models.User;
 import com.cs360.weighttracker.utils.LogCategory;
 import com.cs360.weighttracker.utils.PasswordHasher;
@@ -59,9 +58,9 @@ public class MilestoneRepository {
         try {
             // Try to validate the user to know if they exist in the database.
             User loggedInUser = database.validateUser(user);
-            if (loggedInUser != null && loggedInUser.getUserId() != -1) {
+            if (loggedInUser != null && loggedInUser.userId != -1) {
                 // Store the user's current session
-                sharedPref.setCurrentUserId(loggedInUser.getUserId());
+                sharedPref.setCurrentUserId(loggedInUser.userId);
                 return LoginStatus.SUCCESS;
             } else {
                 // Try to check whether the user exists but has an incorrect password
@@ -142,7 +141,7 @@ public class MilestoneRepository {
                 throw new IllegalStateException("User not found!");
 
             // Update the user if user is logged in.
-            user.setFullName(fullName);
+            user.fullName = fullName;
             return database.updateUser(user);
         } catch (Exception e) {
             Log.e(LogCategory.REPOSITORY, "There was an updating the user!\n" + e.getMessage());
@@ -323,7 +322,7 @@ public class MilestoneRepository {
             if (currentUserId == -1) // There is no current user
                 return false;
             User currentUser = database.getUser(currentUserId);
-            currentUser.setPhoneNumber(phoneNumber);
+            currentUser.phoneNumber = phoneNumber;
             return database.updateUser(currentUser);
         } catch (Exception e) {
             Log.e(LogCategory.REPOSITORY, "There was an error retrieving user's daily weight.\n" + e.getMessage());

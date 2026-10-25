@@ -27,7 +27,6 @@ import androidx.core.content.ContextCompat;
 import com.cs360.weighttracker.database.MilestoneRepository;
 import com.cs360.weighttracker.models.DailyWeight;
 import com.cs360.weighttracker.models.GoalType;
-import com.cs360.weighttracker.models.GoalWeight;
 import com.cs360.weighttracker.models.User;
 import com.cs360.weighttracker.validators.PhoneNumberValidator;
 
@@ -109,13 +108,13 @@ public class ProfileActivity extends AppCompatActivity {
     private void prefillUI() {
         TextView fullNameTextView = findViewById(R.id.tvProfileFullName);
         // If the user has no full name, then use their username(This is highly unlikely).
-        String fullName = currentUser.getFullName();
+        String fullName = currentUser.fullName;
         fullName = !fullName.isEmpty() ? fullName : currentUser.getUserName();
         fullNameTextView.setText(fullName);
 
         // If the user has a phone number set, the update the number the textview with their number
-        if (!currentUser.getPhoneNumber().isEmpty())
-            numberTextView.setText(getString(R.string.sms_number_text, currentUser.getPhoneNumber()));
+        if (!currentUser.phoneNumber.isEmpty())
+            numberTextView.setText(getString(R.string.sms_number_text, currentUser.phoneNumber));
         // Update the notification setting
         notificationSwitch.setChecked(repository.getUserNotificationSetting());
     }
@@ -126,7 +125,7 @@ public class ProfileActivity extends AppCompatActivity {
         DailyWeight latestWeight = repository.getUserLatestLoggedWeight();
 
         // If the user has not logged weight use the initial weight as the current weight
-        float currentWeight = latestWeight == null ? currentGoal.getCurrentWeight() : latestWeight.getUserWeight();
+        float currentWeight = latestWeight == null ? currentGoal.getCurrentWeight() : latestWeight.userWeight;
 
         if (currentGoal.getGoalType() == GoalType.WEIGHT_LOSS) {
             // Get current weight returns the user's initial weight
@@ -209,7 +208,7 @@ public class ProfileActivity extends AppCompatActivity {
     private void handleUserNumberAndToggleSMSOn() {
         // Check if user has a phone number
         // if they don't have, request for a phone number
-        if (currentUser.getPhoneNumber().isEmpty()) {
+        if (currentUser.phoneNumber.isEmpty()) {
             showAddPhoneDialog(); // Show the dialog
         } else {// If we have permission and user has phone number, turn it on!
             toggleSMSSetting(true);
@@ -249,8 +248,8 @@ public class ProfileActivity extends AppCompatActivity {
         TextView phoneNumberErrorTextView = dialogView.findViewById(R.id.tvAddPhoneNumberDialogNumberError);
 
         // If the user already has a phone number update the edit text with it
-        phoneNumberEditText.setText(currentUser.getPhoneNumber());
-        int positiveActionTextRes = currentUser.getPhoneNumber().isEmpty() ? R.string.add_number : R.string.update_number;
+        phoneNumberEditText.setText(currentUser.phoneNumber);
+        int positiveActionTextRes = currentUser.phoneNumber.isEmpty() ? R.string.add_number : R.string.update_number;
 
         new AlertDialog.Builder(this)
                 .setTitle(R.string.add_phone_number)
@@ -280,7 +279,7 @@ public class ProfileActivity extends AppCompatActivity {
                 })
                 .setNegativeButton(R.string.cancel, (dialog, which) -> {
                     // Toggle back the button if there is no phone number
-                    if (currentUser.getPhoneNumber().isEmpty()) {
+                    if (currentUser.phoneNumber.isEmpty()) {
                         notificationSwitch.setChecked(false);
                         toggleSMSSetting(false);
                     }

@@ -19,7 +19,6 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.cs360.weighttracker.database.MilestoneRepository;
-import com.cs360.weighttracker.models.GoalWeight;
 import com.cs360.weighttracker.models.User;
 import com.cs360.weighttracker.validators.WeightValidator;
 
@@ -129,8 +128,8 @@ public class GoalsActivity extends AppCompatActivity {
             return; // This will not hit with our current flow but left here for safety from NPE
         GoalWeight weight = repository.getUserGoalWeight();
 
-        if (!currentUser.getFullName().isEmpty())
-            fullNameEditText.setText(currentUser.getFullName());
+        if (!currentUser.fullName.isEmpty())
+            fullNameEditText.setText(currentUser.fullName);
 
         if (weight != null) {
             currentWeightEditText.setText(String.valueOf(weight.getCurrentWeight()));

@@ -29,8 +29,8 @@ public class WeightItemViewHolder extends RecyclerView.ViewHolder {
         dateTextView.setText(DateFormatter.fromMillis(weight.getDateTimeMillis()));
 
 //        weightTextView.setText(String.valueOf(weight.getUserWeight()));
-        weightTextView.setText(WeightFormatter.format(weight.getUserWeight()));
+        weightTextView.setText(WeightFormatter.format(weight.userWeight));
         // Attach the on delete method call.
-        deleteWeightItemButton.setOnClickListener(view -> onDeleteListener.onRemove(weight.getId()));
+        deleteWeightItemButton.setOnClickListener(view -> onDeleteListener.onRemove(weight.id));
     }
 }

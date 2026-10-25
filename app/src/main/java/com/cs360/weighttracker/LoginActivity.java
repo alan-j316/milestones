@@ -235,7 +235,7 @@ public class LoginActivity extends AppCompatActivity {
     private void navigateOnUserAuth() {
         User user = repository.getCurrentUser();
         if (user != null) {
-            boolean userHasGoalSet = repository.userHasGoalSet(user.getUserId());
+            boolean userHasGoalSet = repository.userHasGoalSet(user.userId);
             if (userHasGoalSet)
                 navigateToHome();
             else

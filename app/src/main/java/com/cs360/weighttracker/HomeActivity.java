@@ -26,7 +26,6 @@ import com.cs360.weighttracker.components.WeightItemAdapter;
 import com.cs360.weighttracker.database.MilestoneRepository;
 import com.cs360.weighttracker.models.DailyWeight;
 import com.cs360.weighttracker.models.GoalType;
-import com.cs360.weighttracker.models.GoalWeight;
 import com.cs360.weighttracker.models.User;
 import com.cs360.weighttracker.utils.TimeUtils;
 
@@ -104,7 +103,7 @@ public class HomeActivity extends AppCompatActivity {
      */
     private void prefillUI() {
         // Setup UI Text
-        String fullName = currentUser.getFullName();
+        String fullName = currentUser.fullName;
         fullNameTextView.setText(fullName);
         // Set the greeting based on time of day
         greetingTextView.setText(TimeUtils.getGreetingResId());
@@ -116,7 +115,7 @@ public class HomeActivity extends AppCompatActivity {
         goalWeightTextView.setText(getString(R.string.weight_format, userGoal.getGoalWeight()));
 
         // If the user has no goal weight set, then set the UserGoal's start weight as the current weight
-        float currentWeight = latestWeight == null ? userGoal.getCurrentWeight() : latestWeight.getUserWeight();
+        float currentWeight = latestWeight == null ? userGoal.getCurrentWeight() : latestWeight.userWeight;
         currentWeightTextView.setText(getString(R.string.weight_format, currentWeight));
         int progress = getProgress(currentWeight);
         weightProgressBar.setProgress(progress);
@@ -218,7 +217,7 @@ public class HomeActivity extends AppCompatActivity {
                         // or has manually turned off the permission, we can assume that they don't need the feature
                         // but we can show them an error message
                         boolean hasPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED;
-                        String phoneNumber = currentUser.getPhoneNumber();
+                        String phoneNumber = currentUser.phoneNumber;
                         if (hasPermission && !phoneNumber.trim().isEmpty()) {
                             try {
                                 GoalWeight userGoal = repository.getUserGoalWeight();
@@ -230,7 +229,7 @@ public class HomeActivity extends AppCompatActivity {
                                     smsManager = SmsManager.getDefault();
                                 }
                                 // We are using hte latest weight as it can surpass the user's current weight!
-                                String message = getString(R.string.congratulations_sms, currentUser.getFullName(), userGoal.getCurrentWeight(), weight);
+                                String message = getString(R.string.congratulations_sms, currentUser.fullName, userGoal.getCurrentWeight(), weight);
                                 if (smsManager != null) {
                                     smsManager.sendTextMessage(phoneNumber, null, message, null, null); //
                                     Toast.makeText(this, R.string.sms_sent_successfully, Toast.LENGTH_SHORT).show(); //
