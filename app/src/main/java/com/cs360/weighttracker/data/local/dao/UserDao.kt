@@ -15,7 +15,7 @@ interface UserDao {
     @Insert(onConflict= OnConflictStrategy.IGNORE)
     suspend fun upsert(user: UserEntity)
 
-    @Query("SELECT * FROM UserEntity WHERE id = :userId")
+    @Query("SELECT * FROM users WHERE id = :userId")
     suspend fun getUser(userId: Long)
 
     @Delete
