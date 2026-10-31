@@ -7,16 +7,23 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Upsert
 import com.cs360.weighttracker.data.local.models.UserEntity
+import com.cs360.weighttracker.domain.models.User
 
 
 @Dao
 interface UserDao {
 
-    @Insert(onConflict= OnConflictStrategy.IGNORE)
-    suspend fun upsert(user: UserEntity)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun upsert(user: UserEntity): Long
 
     @Query("SELECT * FROM users WHERE id = :userId")
-    suspend fun getUser(userId: Long)
+    suspend fun getUser(userId: Long): UserEntity?
+
+    @Query("SELECT * FROM users WHERE userName = :userName AND passwordHash = :passwordHash LIMIT 1")
+    suspend fun validateUser(userName: String, passwordHash: String): UserEntity?
+
+    @Query("SELECT * FROM users WHERE userName = :userName LIMIT 1")
+    suspend fun getUser(userName: String): UserEntity?
 
     @Delete
     suspend fun delete(user: UserEntity)

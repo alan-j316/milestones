@@ -5,7 +5,7 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 
 
-class MilestonePrefs(ctx: Context) {
+class MilestonesSharedPref(ctx: Context) {
 
     ///-----------------------
     ///   INTERNAL CONSTANTS

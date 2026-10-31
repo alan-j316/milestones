@@ -3,6 +3,8 @@ package com.cs360.weighttracker.data
 import android.content.Context
 import android.util.Log
 import com.cs360.weighttracker.data.local.MilestonesDatabase
+import com.cs360.weighttracker.data.local.MilestonesSharedPref
+import com.cs360.weighttracker.data.local.models.UserEntity
 import com.cs360.weighttracker.database.MilestoneDatabase
 import com.cs360.weighttracker.database.MilestonePrefs
 import com.cs360.weighttracker.database.MilestoneRepository
@@ -12,143 +14,139 @@ import com.cs360.weighttracker.domain.models.DailyWeight
 import com.cs360.weighttracker.domain.models.User
 import com.cs360.weighttracker.utils.LogCategory
 import com.cs360.weighttracker.utils.PasswordHasher
-//
-//
-//class MilestoneRepository(
-//    private val database: MilestonesDatabase,
-//    private val sharedPref: Milestone
-//) {
-//    private val sharedPref: MilestonePrefs
-//
-//    init {
-//        this.database = MilestoneDatabase(context)
-//        this.sharedPref = MilestonePrefs(context)
-//    }
-//
-//    /**////////////////////////
-//    * USER AUTH       //
-//    * / */
-//    /**
-//     * Logs in the user with the given username and password.
-//     *
-//     * @param username The username of the user.
-//     * @param password The password of the user.
-//     * @return LoginStatus indicating whether the login was successful or not.
-//     */
-//    fun loginUser(username: String, password: String): LoginStatus {
-//        val hashedPassword = PasswordHasher.hash(password)
-//        val user = User(username, hashedPassword)
-//        try {
-//            // Try to validate the user to know if they exist in the database.
-//            var loggedInUser = database.validateUser(user)
-//            if (loggedInUser != null && loggedInUser.userId != -1L) {
-//                // Store the user's current session
-//                sharedPref.setCurrentUserId(loggedInUser.userId)
-//                return LoginStatus.SUCCESS
-//            } else {
-//                // Try to check whether the user exists but has an incorrect password
-//                loggedInUser = database.getUser(user.userName)
-//                if (loggedInUser != null) { // Indicates user exists but password is incorrect
-//                    return LoginStatus.PASSWORD_ERROR
-//                } else { // Else the user doesn't exist.
-//                    return LoginStatus.USERNAME_ERROR
-//                }
-//            }
-//        } catch (e: Exception) {
-//            Log.e(LogCategory.REPOSITORY, "There was error logging the user in!\n" + e.message)
-//        }
-//        return LoginStatus.UNKNOWN_FAILURE
-//    }
-//
-//
-//    /**
-//     * Registers user with the given username and password.
-//     *
-//     * @param username The username of the user.
-//     * @param password The password of the user.
-//     * @return RegisterStatus indicating whether the registration was successful or not.
-//     */
-//    fun registerUser(username: String, password: String): RegisterStatus {
-//        val hashedPassword = PasswordHasher.hash(password)
-//        try {
-//            // Check whether the user exists in the database.
-//            val existingUser = database.getUser(username)
-//            if (existingUser != null) {
-//                return RegisterStatus.USER_EXISTS
-//            }
-//            // Register the user and save the user session to shared pref
-//            val newUser = User(username, hashedPassword)
-//            val userId = database.insertUser(newUser)
-//
-//            // If the insert was a success login in the user
-//            if (userId != -1L) {
-//                sharedPref.setCurrentUserId(userId)
-//                return RegisterStatus.SUCCESS
-//            } else { // Return error status indicating login error
-//                return RegisterStatus.UNKNOWN_FAILURE
-//            }
-//        } catch (e: Exception) {
-//            Log.e(LogCategory.REPOSITORY, "There was error registering the user!\n" + e.message)
-//        }
-//
-//        return RegisterStatus.UNKNOWN_FAILURE
-//    }
-//
-//    /**
-//     * Logs out the current user.
-//     */
-//    fun logoutUser() {
-//        // Delete the user's session
-//        sharedPref.deleteCurrentUserId()
-//        // And clear user's preference as well
-//        sharedPref.deleteSMSSetting()
-//    }
-//
-//    /**
-//     * Update the user's full name with the give name.
-//     *
-//     * @param fullName The name to update to.
-//     * @return Boolean indicating whether the update was successful or not.
-//     */
-//    fun updateCurrentUserFullName(fullName: String): Boolean {
-//        try {
-//            // Get the user logged-in user's id
-//            val currentUserId = sharedPref.getCurrentUserId()
-//            check(currentUserId != -1L) { "User not logged in!" }
-//
-//            val user = database.getUser(currentUserId)
-//
-//            // Retrieve the user object from database
-//            checkNotNull(user) { "User not found!" }
-//
-//            // Update the user if user is logged in.
-//            user.fullName = fullName
-//            return database.updateUser(user)
-//        } catch (e: Exception) {
-//            Log.e(LogCategory.REPOSITORY, "There was an updating the user!\n" + e.message)
-//        }
-//        return false
-//    }
-//
-//    val currentUser: User?
-//        /***
-//         * Retrieves the current logged-in user
-//         * @return The logged-in user if one exists else null.
-//         */
-//        get() {
-//            try {
-//                // Get the user logged-in user's id
-//                val currentUserId = sharedPref.getCurrentUserId()
-//                if (currentUserId == -1L)  // There is no current user
-//                    return null
-//
-//                return database.getUser(currentUserId)
-//            } catch (e: Exception) {
-//                Log.e(LogCategory.REPOSITORY, "There was an getting the user!\n" + e.message)
-//            }
-//            return null
-//        }
-//
+
+
+class MilestoneRepository(
+    private val database: MilestonesDatabase,
+    private val sharedPref: MilestonesSharedPref
+) {
+
+    ///------------------------
+    ///       USER AUTH
+    ///------------------------
+
+    /**
+     * Logs in the user with the given username and password.
+     *
+     * @param username The username of the user.
+     * @param password The password of the user.
+     * @return LoginStatus indicating whether the login was successful or not.
+     */
+    suspend fun loginUser(username: String, password: String): LoginStatus {
+        val hashedPassword = PasswordHasher.hash(password)
+        val user = UserEntity(username, hashedPassword)
+        try {
+            // Try to validate the user to know if they exist in the database.
+            var loggedInUser = database.userDao.validateUser(username, hashedPassword)
+            if (loggedInUser != null) {
+                // Store the user's current session
+                sharedPref.currentUserId = loggedInUser.id
+                return LoginStatus.SUCCESS
+            } else {
+                // Try to check whether the user exists but has an incorrect password
+                loggedInUser = database.userDao.getUser(user.userName)
+                return if (loggedInUser != null) {
+                    // User exists but password is incorrect
+                    LoginStatus.PASSWORD_ERROR
+                } else {
+                    // The user doesn't exist.
+                    LoginStatus.USERNAME_ERROR
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(LogCategory.REPOSITORY, "There was error logging the user in!\n" + e.message)
+        }
+        return LoginStatus.UNKNOWN_FAILURE
+    }
+
+
+    /**
+     * Registers user with the given username and password.
+     *
+     * @param username The username of the user.
+     * @param password The password of the user.
+     * @return RegisterStatus indicating whether the registration was successful or not.
+     */
+    suspend fun registerUser(username: String, password: String): RegisterStatus {
+        val hashedPassword = PasswordHasher.hash(password)
+        try {
+            // Check whether the user exists in the database.
+            val existingUser = database.userDao.getUser(username)
+            if (existingUser != null) {
+                return RegisterStatus.USER_EXISTS
+            }
+            // Register the user and save the user session to shared pref
+            val newUser = UserEntity(username, hashedPassword)
+            val userId = database.userDao.upsert(newUser)
+
+            // If the insert was a success login in the user
+            if (userId >= 0) {
+                sharedPref.currentUserId = userId
+                return RegisterStatus.SUCCESS
+            } else { // Return error status indicating login error
+                return RegisterStatus.UNKNOWN_FAILURE
+            }
+        } catch (e: Exception) {
+            Log.e(LogCategory.REPOSITORY, "There was error registering the user!\n" + e.message)
+        }
+
+        return RegisterStatus.UNKNOWN_FAILURE
+    }
+
+
+    /**
+     * Logs out the current user.
+     */
+    fun logoutUser() {
+        // Delete the user's session
+        sharedPref.deleteCurrentUserId()
+        // And clear user's preference as well
+        sharedPref.deleteSMSSetting()
+    }
+
+    /**
+     * Update the user's full name with the give name.
+     *
+     * @param fullName The name to update to.
+     * @return Boolean indicating whether the update was successful or not.
+     */
+    suspend fun updateCurrentUserFullName(fullName: String): Boolean {
+        try {
+            // Get the user logged-in user's id
+            val currentUserId = sharedPref.currentUserId
+            check(currentUserId < 0) { "User not logged in!" }
+
+            val user = database.userDao.getUser(currentUserId)
+
+            // Retrieve the user object from database
+            checkNotNull(user) { "User not found!" }
+
+            // Update the user if user is logged in.
+            return database.userDao.upsert(user.copy(fullName = fullName)) >= 0
+        } catch (e: Exception) {
+            Log.e(LogCategory.REPOSITORY, "There was an updating the user!\n" + e.message)
+        }
+        return false
+    }
+
+    // TODO: Update from entity to domain object
+    /***
+     * Retrieves the current logged-in user
+     * @return The logged-in user if one exists else null.
+     */
+    suspend fun getCurrentUser(): UserEntity? {
+        try {
+            // Get the user logged-in user's id
+            val currentUserId = sharedPref.currentUserId
+            if (currentUserId < 0)  // There is no current user
+                return null
+            return database.userDao.getUser(currentUserId)
+        } catch (e: Exception) {
+            Log.e(LogCategory.REPOSITORY, "There was an getting the user!\n" + e.message)
+        }
+        return null
+    }
+
 //
 //    /** ////////////////////////
 //     * USER WEIGHT    ///
@@ -384,4 +382,4 @@ import com.cs360.weighttracker.utils.PasswordHasher
 //            return MilestoneRepository.Companion.instance
 //        }
 //    }
-//}
+}
