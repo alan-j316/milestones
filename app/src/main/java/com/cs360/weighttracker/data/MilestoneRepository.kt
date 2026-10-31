@@ -1,18 +1,12 @@
 package com.cs360.weighttracker.data
 
-import android.content.Context
 import android.util.Log
 import com.cs360.weighttracker.data.local.MilestonesDatabase
 import com.cs360.weighttracker.data.local.MilestonesSharedPref
 import com.cs360.weighttracker.data.local.models.DailyWeightEntity
 import com.cs360.weighttracker.data.local.models.UserEntity
-import com.cs360.weighttracker.database.MilestoneDatabase
-import com.cs360.weighttracker.database.MilestonePrefs
-import com.cs360.weighttracker.database.MilestoneRepository
-import com.cs360.weighttracker.database.status.LoginStatus
-import com.cs360.weighttracker.database.status.RegisterStatus
-import com.cs360.weighttracker.domain.models.DailyWeight
-import com.cs360.weighttracker.domain.models.User
+import com.cs360.weighttracker.data.local.status.LoginStatus
+import com.cs360.weighttracker.data.local.status.RegisterStatus
 import com.cs360.weighttracker.utils.LogCategory
 import com.cs360.weighttracker.utils.PasswordHasher
 import kotlinx.coroutines.flow.Flow
