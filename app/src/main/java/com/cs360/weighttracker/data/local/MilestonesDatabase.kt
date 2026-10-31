@@ -6,7 +6,6 @@ import com.cs360.weighttracker.data.local.dao.DailyWeightDao
 import com.cs360.weighttracker.data.local.dao.GoalWeightDao
 import com.cs360.weighttracker.data.local.dao.UserDao
 import com.cs360.weighttracker.data.local.models.DailyWeightEntity
-import com.cs360.weighttracker.data.local.models.GoalWeightEntity
 import com.cs360.weighttracker.data.local.models.UserEntity
 
 @Database(
