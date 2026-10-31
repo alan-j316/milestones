@@ -314,59 +314,12 @@ class MilestoneRepository(
     }
 
 
-//    val userNotificationSetting: Boolean
-//        /**
-//         * Return the user's current sms setting.
-//         */
-//        get() {
-//            try {
-//                return sharedPref.getSMSSetting()
-//            } catch (e: Exception) {
-//                Log.e(
-//                    LogCategory.REPOSITORY,
-//                    "There was an error getting notification preference.\n" + e.message
-//                )
-//            }
-//            // Always return false if the setting has not been applied.
-//            return false
-//        }
-//
-//
-//    /**
-//     * Set the user's current notification setting
-//     *
-//     * @param setting The notification setting flag to set.
-//     */
-//    fun setUserNotificationSetting(setting: Boolean): Boolean {
-//        try {
-//            sharedPref.setSMSSetting(setting)
-//            return setting // Return the setting if it has been applied.
-//        } catch (e: Exception) {
-//            Log.e(
-//                LogCategory.REPOSITORY,
-//                "There was an error setting notification preference.\n" + e.message
-//            )
-//        }
-//        // Always return false if the setting has not been applied.
-//        return false
-//    }
-//
-//
-//    companion object {
-//        private var instance: MilestoneRepository? = null
-//
-//        /**
-//         * Get a singleton instance of the repository.
-//         *
-//         * @param context The android context.
-//         * @return A repository instance.
-//         */
-//        @Synchronized
-//        fun getInstance(context: Context): MilestoneRepository {
-//            if (MilestoneRepository.Companion.instance == null) {
-//                MilestoneRepository.Companion.instance = MilestoneRepository(context)
-//            }
-//            return MilestoneRepository.Companion.instance
-//        }
-//    }
+    /**
+     * The user's SMS notification setting.
+     */
+    var userNotificationSetting: Boolean
+        get() = sharedPref.smsSetting ?: false
+        set(value: Boolean) {
+            sharedPref.smsSetting = value
+        }
 }
