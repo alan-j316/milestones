@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import com.cs360.weighttracker.data.local.MilestonesDatabase
 import com.cs360.weighttracker.data.local.MilestonesSharedPref
+import com.cs360.weighttracker.data.local.models.DailyWeightEntity
 import com.cs360.weighttracker.data.local.models.UserEntity
 import com.cs360.weighttracker.database.MilestoneDatabase
 import com.cs360.weighttracker.database.MilestonePrefs
@@ -14,6 +15,8 @@ import com.cs360.weighttracker.domain.models.DailyWeight
 import com.cs360.weighttracker.domain.models.User
 import com.cs360.weighttracker.utils.LogCategory
 import com.cs360.weighttracker.utils.PasswordHasher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 
 class MilestoneRepository(
@@ -114,7 +117,7 @@ class MilestoneRepository(
         try {
             // Get the user logged-in user's id
             val currentUserId = sharedPref.currentUserId
-            check(currentUserId < 0) { "User not logged in!" }
+            check(currentUserId >= 0) { "User not logged in!" }
 
             val user = database.userDao.getUser(currentUserId)
 
@@ -147,186 +150,170 @@ class MilestoneRepository(
         return null
     }
 
-//
-//    /** ////////////////////////
-//     * USER WEIGHT    ///
-//     * /////////////////////// */
-//    /**
-//     * Logs the user's daily weight.
-//     *
-//     * @param weight Today's weight to log.
-//     * @return A boolean whether the weight logging was successful.
-//     */
-//    fun logDailyWeight(weight: Float): Boolean {
-//        try {
-//            // Get the user logged-in user's id
-//            val currentUserId = sharedPref.getCurrentUserId()
-//            if (currentUserId == -1L)  // There is no current user
-//                return false
-//
-//            // Create a daily weight object
-//            val dailyWeight = DailyWeight(weight, System.currentTimeMillis())
-//            return database.insertDailyWeight(currentUserId, dailyWeight) > 0
-//        } catch (e: Exception) {
-//            Log.e(LogCategory.REPOSITORY, "There was error logging the user weight!\n" + e.message)
-//        }
-//        return false
-//    }
-//
-//
-//    /**
-//     * Deletes the daily weight with the given id.
-//     *
-//     * @param id The id of the daily weight to delete.
-//     * @return A boolean indicating whether the weight was deleted.
-//     */
-//    fun deleteDailyWeight(id: Long): Boolean {
-//        try {
-//            return database.deleteDailyWeight(id)
-//        } catch (e: Exception) {
-//            Log.e(LogCategory.REPOSITORY, "There was error logging the user weight!\n" + e.message)
-//        }
-//        return false
-//    }
-//
-//
-//    /**
-//     * Updates or inserts the user's current and goal weight.
-//     *
-//     * @param currentWeight The user's current weight.
-//     * @param goalWeight    The user's goal weight.
-//     * @return A boolean indicating whether the goal weight was upserted.
-//     */
-//    fun upsertGoalWeight(currentWeight: Float, goalWeight: Float): Boolean {
-//        try {
-//            // NOTE: Upsert logic is handled by the database so there is no need to check it here
-//            // Get the user logged-in user's id
-//            val currentUserId = sharedPref.getCurrentUserId()
-//            if (currentUserId == -1L)  // There is no current user
-//                return false
-//            val gWeight: GoalWeight = GoalWeight(currentWeight, goalWeight)
-//            return database.upsertGoalWeight(currentUserId, gWeight)
-//        } catch (e: Exception) {
-//            Log.e(LogCategory.REPOSITORY, "There was error logging the user weight!\n" + e.message)
-//        }
-//        return false
-//    }
-//
-//
-//    val dailyWeights: MutableList<DailyWeight?>?
-//        /**
-//         * Get all the logged daily weights for the currently logged-in user.
-//         *
-//         * @return List of daily weights or an empty list if an error occurs of if the user has no daily weight logged.
-//         */
-//        get() {
-//            try {
-//                // Get the user logged-in user's id
-//                val currentUserId = sharedPref.getCurrentUserId()
-//                if (currentUserId == -1L)  // There is no current user
-//                    return mutableListOf<DailyWeight?>()
-//                return database.getDailyWeights(currentUserId)
-//            } catch (e: Exception) {
-//                Log.e(
-//                    LogCategory.REPOSITORY,
-//                    "There was an error retrieving user's daily weights.\n" + e.message
-//                )
-//            }
-//            return mutableListOf<DailyWeight?>()
-//        }
-//
-//
-//    /**
-//     * Gets whether the user has a goal weight set.
-//     *
-//     * @param userId The current user's id.
-//     * @return A boolean whether the user has a goal weight.
-//     */
-//    fun userHasGoalSet(userId: Long): Boolean {
-//        try {
-//            return database.getGoalWeight(userId) != null
-//        } catch (e: Exception) {
-//            Log.e(
-//                LogCategory.REPOSITORY,
-//                "There was error retrieving the user's goal weight!\n" + e.message
-//            )
-//        }
-//        return false
-//    }
-//
-//
-//    val userGoalWeight: GoalWeight?
-//        /**
-//         * Get the current user's goal weight.
-//         *
-//         * @return The current user's goal weight or null if the user has none.
-//         */
-//        get() {
-//            try {
-//                // Get the user logged-in user's id
-//                val currentUserId = sharedPref.getCurrentUserId()
-//                if (currentUserId == -1L)  // There is no current user
-//                    return null
-//                return database.getGoalWeight(currentUserId)
-//            } catch (e: Exception) {
-//                Log.e(
-//                    LogCategory.REPOSITORY,
-//                    "There was an error retrieving user's goal weight.\n" + e.message
-//                )
-//            }
-//            return null
-//        }
-//
-//
-//    val userLatestLoggedWeight: DailyWeight?
-//        /**
-//         * Get the current user's latest logged weight.
-//         *
-//         * @return The current user's latest logged weight or null if the user has none.
-//         */
-//        get() {
-//            try {
-//                // Get the user logged-in user's id
-//                val currentUserId = sharedPref.getCurrentUserId()
-//                if (currentUserId == -1L)  // There is no current user
-//                    return null
-//                return database.getLatestDailyWeight(currentUserId)
-//            } catch (e: Exception) {
-//                Log.e(
-//                    LogCategory.REPOSITORY,
-//                    "There was an error retrieving user's daily weight.\n" + e.message
-//                )
-//            }
-//            return null
-//        }
-//
-//
-//    /**
-//     * Update the user's phone number.
-//     *
-//     * @return A boolean indicating whether the operation was successful.
-//     */
-//    fun setPhoneNumber(phoneNumber: String): Boolean {
-//        try {
-//            // Unsetting a phone number is not possible
-//            if (phoneNumber.isEmpty()) return false
-//            // Get the user logged-in user's id
-//            val currentUserId = sharedPref.getCurrentUserId()
-//            if (currentUserId == -1L)  // There is no current user
-//                return false
-//            val currentUser = database.getUser(currentUserId)
-//            currentUser.phoneNumber = phoneNumber
-//            return database.updateUser(currentUser)
-//        } catch (e: Exception) {
-//            Log.e(
-//                LogCategory.REPOSITORY,
-//                "There was an error retrieving user's daily weight.\n" + e.message
-//            )
-//        }
-//        return false
-//    }
-//
-//
+
+    ///------------------------
+    ///      USER WEIGHT
+    ///------------------------
+    /**
+     * Logs the user's daily weight.
+     *
+     * @param weight Today's weight to log.
+     * @return A boolean whether the weight logging was successful.
+     */
+    suspend fun logDailyWeight(weight: Float): Boolean {
+        try {
+            // Get the user logged-in user's id
+            val currentUserId = sharedPref.currentUserId
+            if (currentUserId < 0)  // There is no current user
+                return false
+
+            // Create a daily weight object
+            val dailyWeight = DailyWeightEntity(weight, System.currentTimeMillis(), currentUserId)
+            return database.dailyWeightDao.upsert(dailyWeight) >= 0
+        } catch (e: Exception) {
+            Log.e(LogCategory.REPOSITORY, "There was error logging the user weight!\n" + e.message)
+        }
+        return false
+    }
+
+
+    /**
+     * Deletes the daily weight with the given id.
+     *
+     * @param id The id of the daily weight to delete.
+     * @return A boolean indicating whether the weight was deleted.
+     */
+    suspend fun deleteDailyWeight(id: Long): Boolean {
+        try {
+            return database.dailyWeightDao.delete(id) > 0
+        } catch (e: Exception) {
+            Log.e(LogCategory.REPOSITORY, "There was error logging the user weight!\n" + e.message)
+        }
+        return false
+    }
+
+
+    /**
+     * Updates or inserts the user's current and goal weight.
+     *
+     * @param currentWeight The user's current weight.
+     * @param goalWeight    The user's goal weight.
+     * @return A boolean indicating whether the goal weight was upserted.
+     */
+    suspend fun upsertGoalWeight(currentWeight: Float, goalWeight: Float): Boolean {
+        try {
+            // NOTE: Upsert logic is handled by the database so there is no need to check it here
+            // Get the user logged-in user's id
+            val currentUserId = sharedPref.currentUserId
+            if (currentUserId < 0)  // There is no current user
+                return false
+            val user = database.userDao.getUser(currentUserId)
+            checkNotNull(user) { "User not logged in!" }
+
+            return database.userDao.upsert(
+                user.copy(
+                    currentWeight = currentWeight,
+                    goalWeight = goalWeight
+                )
+            ) >= 0
+        } catch (e: Exception) {
+            Log.e(LogCategory.REPOSITORY, "There was error logging the user weight!\n" + e.message)
+        }
+        return false
+    }
+
+
+    /**
+     * All the logged daily weights for the current user.
+     *
+     * @return A reactive flow of daily weights(List).
+     */
+    val dailyWeights: Flow<List<DailyWeightEntity>>
+        get() {
+            try {
+                // Get the user logged-in user's id
+                val currentUserId = sharedPref.currentUserId
+                if (currentUserId < 0)  // There is no current user
+                    return flow { listOf<DailyWeightEntity>() }
+                return database.dailyWeightDao.getAllUserWeights(currentUserId)
+            } catch (e: Exception) {
+                Log.e(
+                    LogCategory.REPOSITORY,
+                    "There was an error retrieving user's daily weights.\n" + e.message
+                )
+            }
+            return flow { listOf<DailyWeightEntity>() }
+        }
+
+
+    /**
+     * Gets whether the user has a goal weight set.
+     *
+     * @param userId The current user's id.
+     * @return A boolean whether the user has a goal weight.
+     */
+    suspend fun userHasGoalSet(userId: Long): Boolean {
+        try {
+            val user = database.userDao.getUser(userId);
+            return if (user == null) false else user.goalWeight >= 0.0f
+        } catch (e: Exception) {
+            Log.e(
+                LogCategory.REPOSITORY,
+                "There was error retrieving the user's goal weight!\n" + e.message
+            )
+        }
+        return false
+    }
+
+
+    /**
+     * Get the current user's latest logged weight.
+     *
+     * @return The current user's latest logged weight or null if the user has none.
+     */
+    suspend fun getLatestLoggedWeight(userId: Long): DailyWeightEntity? {
+        try {
+            // Get the user logged-in user's id
+            val currentUserId = sharedPref.currentUserId
+            if (currentUserId < 0)  // There is no current user
+                return null
+            return database.dailyWeightDao.getLatestUserWeight(currentUserId)
+        } catch (e: Exception) {
+            Log.e(
+                LogCategory.REPOSITORY,
+                "There was an error retrieving user's daily weight.\n" + e.message
+            )
+        }
+        return null
+
+    }
+
+
+    /**
+     * Update the user's phone number.
+     *
+     * @return A boolean indicating whether the operation was successful.
+     */
+    suspend fun setPhoneNumber(phoneNumber: String): Boolean {
+        try {
+            // Unsetting a phone number is not possible
+            if (phoneNumber.isEmpty()) return false
+            // Get the user logged-in user's id
+            val currentUserId = sharedPref.currentUserId
+            if (currentUserId < 0)  // There is no current user
+                return false
+            val currentUser = database.userDao.getUser(currentUserId) ?: return false
+            return database.userDao.upsert(currentUser.copy(phoneNumber = phoneNumber)) > -1
+        } catch (e: Exception) {
+            Log.e(
+                LogCategory.REPOSITORY,
+                "There was an error retrieving user's daily weight.\n" + e.message
+            )
+        }
+        return false
+    }
+
+
 //    val userNotificationSetting: Boolean
 //        /**
 //         * Return the user's current sms setting.

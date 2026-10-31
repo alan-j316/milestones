@@ -12,11 +12,14 @@ import kotlinx.coroutines.flow.Flow
 interface DailyWeightDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun add(weight: DailyWeightEntity)
+    suspend fun upsert(weight: DailyWeightEntity): Long
 
-    @Delete
-    suspend fun delete(weight: DailyWeightEntity)
+    @Query("DELETE FROM dailyWeights WHERE id = :id")
+    suspend fun delete(id: Long): Int
 
     @Query("SELECT * FROM dailyWeights WHERE userId = :userId")
     fun getAllUserWeights(userId: Long): Flow<List<DailyWeightEntity>>
+
+    @Query("SELECT * FROM dailyWeights WHERE userId = :userId ORDER BY dateTimeMillis DESC LIMIT 1")
+    suspend fun getLatestUserWeight(userId: Long): DailyWeightEntity?
 }
