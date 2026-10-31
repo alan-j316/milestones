@@ -3,7 +3,7 @@ package com.cs360.weighttracker.data.local.models
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity
+@Entity(tableName = "users")
 data class UserEntity(
     val userName: String,
     val passwordHash: String,
