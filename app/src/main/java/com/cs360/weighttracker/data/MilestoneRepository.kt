@@ -13,7 +13,7 @@ import com.cs360.weighttracker.domain.models.User
 import com.cs360.weighttracker.domain.toDailyWeight
 import com.cs360.weighttracker.domain.toUser
 import com.cs360.weighttracker.presentation.utils.LogCategory
-import com.cs360.weighttracker.presentation.utils.PasswordHasher
+import com.cs360.weighttracker.data.utils.PasswordHasher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map

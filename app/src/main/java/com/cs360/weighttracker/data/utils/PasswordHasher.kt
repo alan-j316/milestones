@@ -1,4 +1,4 @@
-package com.cs360.weighttracker.presentation.utils
+package com.cs360.weighttracker.data.utils
 
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
@@ -7,7 +7,7 @@ import java.security.NoSuchAlgorithmException
 object PasswordHasher {
     /**
      * Hashes a password using SHA-256 from plain text.
-     * 
+     *
      * @param plainText The plain text string to hash.
      * @return The hashed string.
      */
