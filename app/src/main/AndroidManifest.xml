@@ -19,7 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WeightTracker">
         <activity
-            android:name=".LoginActivity"
+            android:name=".presentation.LoginActivity"
             android:exported="true"
             android:theme="@style/Theme.WeightTracker"
             android:windowSoftInputMode="adjustResize">
@@ -30,25 +30,25 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".RegisterActivity"
+            android:name=".presentation.RegisterActivity"
             android:exported="true"
             android:theme="@style/Theme.WeightTracker"
             android:windowSoftInputMode="adjustResize">
         </activity>
         <activity
-            android:name=".HomeActivity"
+            android:name=".presentation.HomeActivity"
             android:exported="true"
             android:theme="@style/Theme.WeightTracker"
             android:windowSoftInputMode="adjustResize">
         </activity>
         <activity
-            android:name=".ProfileActivity"
+            android:name=".presentation.ProfileActivity"
             android:exported="true"
             android:theme="@style/Theme.WeightTracker"
             android:windowSoftInputMode="adjustResize">
         </activity>
         <activity
-            android:name=".GoalsActivity"
+            android:name=".presentation.GoalsActivity"
             android:exported="true"
             android:theme="@style/Theme.WeightTracker"
             android:windowSoftInputMode="adjustResize">

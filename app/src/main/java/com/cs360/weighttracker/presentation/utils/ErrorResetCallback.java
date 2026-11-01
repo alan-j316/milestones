@@ -1,4 +1,4 @@
-package com.cs360.weighttracker.utils;
+package com.cs360.weighttracker.presentation.utils;
 
 /**
  * Interface for passing around click listeners in function.

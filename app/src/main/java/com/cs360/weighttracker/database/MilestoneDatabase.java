@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 
 import com.cs360.weighttracker.domain.models.DailyWeight;
 import com.cs360.weighttracker.domain.models.User;
-import com.cs360.weighttracker.utils.LogCategory;
+import com.cs360.weighttracker.presentation.utils.LogCategory;
 
 import java.util.ArrayList;
 import java.util.List;

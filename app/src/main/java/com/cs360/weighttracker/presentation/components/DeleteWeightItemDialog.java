@@ -1,4 +1,4 @@
-package com.cs360.weighttracker.components;
+package com.cs360.weighttracker.presentation.components;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

@@ -1,4 +1,4 @@
-package com.cs360.weighttracker;
+package com.cs360.weighttracker.presentation;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,9 +18,10 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.cs360.weighttracker.R;
 import com.cs360.weighttracker.database.MilestoneRepository;
 import com.cs360.weighttracker.domain.models.User;
-import com.cs360.weighttracker.validators.WeightValidator;
+import com.cs360.weighttracker.presentation.validators.WeightValidator;
 
 public class GoalsActivity extends AppCompatActivity {
 

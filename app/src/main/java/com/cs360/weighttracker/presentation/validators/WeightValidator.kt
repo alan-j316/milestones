@@ -1,4 +1,4 @@
-package com.cs360.weighttracker.validators
+package com.cs360.weighttracker.presentation.validators
 
 object WeightValidator {
     const val MIN_WEIGHT: Float = 1.0f
@@ -12,6 +12,6 @@ object WeightValidator {
      */
     @JvmStatic
     fun validate(weight: Float): Boolean {
-        return weight >= MIN_WEIGHT && weight <= MAX_WEIGHT
+        return weight in MIN_WEIGHT..MAX_WEIGHT
     }
 }

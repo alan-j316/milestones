@@ -1,4 +1,4 @@
-package com.cs360.weighttracker;
+package com.cs360.weighttracker.presentation;
 
 import android.Manifest;
 import android.content.Intent;
@@ -24,11 +24,12 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.cs360.weighttracker.R;
 import com.cs360.weighttracker.database.MilestoneRepository;
 import com.cs360.weighttracker.domain.models.DailyWeight;
 import com.cs360.weighttracker.domain.models.GoalType;
 import com.cs360.weighttracker.domain.models.User;
-import com.cs360.weighttracker.validators.PhoneNumberValidator;
+import com.cs360.weighttracker.presentation.validators.PhoneNumberValidator;
 
 public class ProfileActivity extends AppCompatActivity {
 

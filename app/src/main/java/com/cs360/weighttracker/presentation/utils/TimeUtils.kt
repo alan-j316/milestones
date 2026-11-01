@@ -1,4 +1,4 @@
-package com.cs360.weighttracker.utils
+package com.cs360.weighttracker.presentation.utils
 
 import androidx.annotation.StringRes
 import com.cs360.weighttracker.R

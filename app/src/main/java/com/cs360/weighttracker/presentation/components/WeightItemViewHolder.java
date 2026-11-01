@@ -1,4 +1,4 @@
-package com.cs360.weighttracker.components;
+package com.cs360.weighttracker.presentation.components;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -9,8 +9,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.cs360.weighttracker.R;
 import com.cs360.weighttracker.domain.models.DailyWeight;
-import com.cs360.weighttracker.utils.DateFormatter;
-import com.cs360.weighttracker.utils.WeightFormatter;
+import com.cs360.weighttracker.presentation.utils.DateFormatter;
+import com.cs360.weighttracker.presentation.utils.WeightFormatter;
 
 public class WeightItemViewHolder extends RecyclerView.ViewHolder {
 

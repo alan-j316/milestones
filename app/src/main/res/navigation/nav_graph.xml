@@ -6,18 +6,18 @@
     app:startDestination="@id/loginActivity">
     <activity
         android:id="@+id/loginActivity"
-        android:name="com.cs360.weighttracker.LoginActivity"
+        android:name="com.cs360.weighttracker.presentation.LoginActivity"
         android:label="LoginActivity" />
     <activity
         android:id="@+id/goalsActivity"
-        android:name="com.cs360.weighttracker.GoalsActivity"
+        android:name="com.cs360.weighttracker.presentation.GoalsActivity"
         android:label="GoalsActivity" />
     <activity
         android:id="@+id/mainActivity"
-        android:name="com.cs360.weighttracker.HomeActivity"
+        android:name="com.cs360.weighttracker.presentation.HomeActivity"
         android:label="MainActivity" />
     <activity
         android:id="@+id/profileActivity"
-        android:name="com.cs360.weighttracker.ProfileActivity"
+        android:name="com.cs360.weighttracker.presentation.ProfileActivity"
         android:label="ProfileActivity" />
 </navigation>

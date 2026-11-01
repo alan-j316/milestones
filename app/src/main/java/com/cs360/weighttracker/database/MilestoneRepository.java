@@ -9,8 +9,8 @@ import com.cs360.weighttracker.domain.status.LoginStatus;
 import com.cs360.weighttracker.domain.status.RegisterStatus;
 import com.cs360.weighttracker.domain.models.DailyWeight;
 import com.cs360.weighttracker.domain.models.User;
-import com.cs360.weighttracker.utils.LogCategory;
-import com.cs360.weighttracker.utils.PasswordHasher;
+import com.cs360.weighttracker.presentation.utils.LogCategory;
+import com.cs360.weighttracker.presentation.utils.PasswordHasher;
 
 import java.util.Collections;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.cs360.weighttracker;
+package com.cs360.weighttracker.presentation;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,11 +20,12 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.cs360.weighttracker.R;
 import com.cs360.weighttracker.database.MilestoneRepository;
 import com.cs360.weighttracker.domain.status.RegisterStatus;
-import com.cs360.weighttracker.utils.PasswordVisibilityToggler;
-import com.cs360.weighttracker.validators.PasswordValidator;
-import com.cs360.weighttracker.validators.UsernameValidator;
+import com.cs360.weighttracker.presentation.utils.PasswordVisibilityToggler;
+import com.cs360.weighttracker.presentation.validators.PasswordValidator;
+import com.cs360.weighttracker.presentation.validators.UsernameValidator;
 
 public class RegisterActivity extends AppCompatActivity {
 

@@ -1,4 +1,4 @@
-package com.cs360.weighttracker.utils
+package com.cs360.weighttracker.presentation.utils
 
 object LogCategory {
     const val DATABASE: String = "[Milestone Database] "

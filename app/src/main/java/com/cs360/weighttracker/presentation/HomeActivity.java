@@ -1,4 +1,4 @@
-package com.cs360.weighttracker;
+package com.cs360.weighttracker.presentation;
 
 
 import android.Manifest;
@@ -20,14 +20,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.cs360.weighttracker.components.AddWeightDialog;
-import com.cs360.weighttracker.components.DeleteWeightItemDialog;
-import com.cs360.weighttracker.components.WeightItemAdapter;
+import com.cs360.weighttracker.R;
+import com.cs360.weighttracker.presentation.components.AddWeightDialog;
+import com.cs360.weighttracker.presentation.components.DeleteWeightItemDialog;
+import com.cs360.weighttracker.presentation.components.WeightItemAdapter;
 import com.cs360.weighttracker.database.MilestoneRepository;
 import com.cs360.weighttracker.domain.models.DailyWeight;
 import com.cs360.weighttracker.domain.models.GoalType;
 import com.cs360.weighttracker.domain.models.User;
-import com.cs360.weighttracker.utils.TimeUtils;
+import com.cs360.weighttracker.presentation.utils.TimeUtils;
 
 import java.util.List;
 

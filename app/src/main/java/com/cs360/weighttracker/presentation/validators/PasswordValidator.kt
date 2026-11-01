@@ -1,4 +1,4 @@
-package com.cs360.weighttracker.validators
+package com.cs360.weighttracker.presentation.validators
 
 object PasswordValidator {
     /**

@@ -1,4 +1,4 @@
-package com.cs360.weighttracker.components;
+package com.cs360.weighttracker.presentation.components;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -15,9 +15,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
-import com.cs360.weighttracker.Constants;
+import com.cs360.weighttracker.presentation.Constants;
 import com.cs360.weighttracker.R;
-import com.cs360.weighttracker.validators.WeightValidator;
+import com.cs360.weighttracker.presentation.validators.WeightValidator;
 
 public class AddWeightDialog extends DialogFragment {
 
