@@ -5,15 +5,15 @@ import com.cs360.weighttracker.data.local.MilestonesDatabase
 import com.cs360.weighttracker.data.local.MilestonesSharedPref
 import com.cs360.weighttracker.data.local.models.DailyWeightEntity
 import com.cs360.weighttracker.data.local.models.UserEntity
-import com.cs360.weighttracker.domain.status.LoginStatus
-import com.cs360.weighttracker.domain.status.RegisterStatus
+import com.cs360.weighttracker.data.utils.PasswordHasher
 import com.cs360.weighttracker.domain.IMilestoneRepository
 import com.cs360.weighttracker.domain.models.DailyWeight
 import com.cs360.weighttracker.domain.models.User
+import com.cs360.weighttracker.domain.status.LoginStatus
+import com.cs360.weighttracker.domain.status.RegisterStatus
 import com.cs360.weighttracker.domain.toDailyWeight
 import com.cs360.weighttracker.domain.toUser
 import com.cs360.weighttracker.presentation.utils.LogCategory
-import com.cs360.weighttracker.data.utils.PasswordHasher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -299,7 +299,7 @@ class MilestoneRepository(
      *
      * @return The current user's latest logged weight or null if the user has none.
      */
-    override fun getLatestLoggedWeight(userId: Long): Flow<DailyWeight?> {
+    override fun getLatestLoggedWeight(): Flow<DailyWeight?> {
         try {
             // Get the user logged-in user's id
             val currentUserId = sharedPref.currentUserId

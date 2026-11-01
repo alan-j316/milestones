@@ -21,11 +21,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.cs360.weighttracker.R
 import com.cs360.weighttracker.presentation.goals.GoalsActivity
-import com.cs360.weighttracker.presentation.HomeActivity
+import com.cs360.weighttracker.presentation.home.HomeActivity
 import com.cs360.weighttracker.presentation.register.RegisterActivity
 import com.cs360.weighttracker.presentation.utils.PasswordVisibilityToggler
 import kotlinx.coroutines.launch
-import kotlin.getValue
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var usernameErrorTextView: TextView

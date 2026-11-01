@@ -5,9 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Upsert
 import com.cs360.weighttracker.data.local.models.UserEntity
-import com.cs360.weighttracker.domain.models.User
 
 
 @Dao

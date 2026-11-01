@@ -3,8 +3,6 @@ package com.cs360.weighttracker.presentation.goals
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -22,16 +20,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.cs360.weighttracker.R
 import com.cs360.weighttracker.presentation.Constants
-import com.cs360.weighttracker.presentation.HomeActivity
-import com.cs360.weighttracker.presentation.validators.WeightValidator.validate
+import com.cs360.weighttracker.presentation.home.HomeActivity
 import kotlinx.coroutines.launch
 import java.lang.String
 import kotlin.Boolean
-import kotlin.CharSequence
 import kotlin.Exception
-import kotlin.Float
-import kotlin.Int
-import kotlin.Unit
+import kotlin.getValue
 
 class GoalsActivity : AppCompatActivity() {
     private lateinit var fullNameEditText: EditText

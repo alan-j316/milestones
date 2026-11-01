@@ -1,9 +1,9 @@
 package com.cs360.weighttracker.domain
 
-import com.cs360.weighttracker.domain.status.LoginStatus
-import com.cs360.weighttracker.domain.status.RegisterStatus
 import com.cs360.weighttracker.domain.models.DailyWeight
 import com.cs360.weighttracker.domain.models.User
+import com.cs360.weighttracker.domain.status.LoginStatus
+import com.cs360.weighttracker.domain.status.RegisterStatus
 import kotlinx.coroutines.flow.Flow
 
 interface IMilestoneRepository {
@@ -104,7 +104,7 @@ interface IMilestoneRepository {
      *
      * @return The current user's latest logged weight or null if the user has none.
      */
-    fun getLatestLoggedWeight(userId: Long): Flow<DailyWeight?>
+    fun getLatestLoggedWeight(): Flow<DailyWeight?>
 
     /**
      * Update the user's phone number.

@@ -14,7 +14,7 @@
         android:label="GoalsActivity" />
     <activity
         android:id="@+id/mainActivity"
-        android:name="com.cs360.weighttracker.presentation.HomeActivity"
+        android:name="com.cs360.weighttracker.presentation.home.HomeActivity"
         android:label="MainActivity" />
     <activity
         android:id="@+id/profileActivity"
