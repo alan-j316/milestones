@@ -7,11 +7,16 @@ import com.cs360.weighttracker.data.local.models.DailyWeightEntity
 import com.cs360.weighttracker.data.local.models.UserEntity
 import com.cs360.weighttracker.data.local.status.LoginStatus
 import com.cs360.weighttracker.data.local.status.RegisterStatus
-import com.cs360.weighttracker.domain.models.IMilestoneRepository
+import com.cs360.weighttracker.domain.IMilestoneRepository
+import com.cs360.weighttracker.domain.models.DailyWeight
+import com.cs360.weighttracker.domain.models.User
+import com.cs360.weighttracker.domain.toDailyWeight
+import com.cs360.weighttracker.domain.toUser
 import com.cs360.weighttracker.utils.LogCategory
 import com.cs360.weighttracker.utils.PasswordHasher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 
 
 class MilestoneRepository(
@@ -127,18 +132,18 @@ class MilestoneRepository(
         return false
     }
 
-    // TODO: Update from entity to domain object
+
     /***
      * Retrieves the current logged-in user
      * @return The logged-in user if one exists else null.
      */
-    override suspend fun getCurrentUser(): UserEntity? {
+    override suspend fun getCurrentUser(): User? {
         try {
             // Get the user logged-in user's id
             val currentUserId = sharedPref.currentUserId
             if (currentUserId < 0)  // There is no current user
                 return null
-            return database.userDao.getUser(currentUserId)
+            return database.userDao.getUser(currentUserId)?.toUser()
         } catch (e: Exception) {
             Log.e(LogCategory.REPOSITORY, "There was an getting the user!\n" + e.message)
         }
@@ -223,7 +228,7 @@ class MilestoneRepository(
      *
      * @return A reactive flow of daily weights(List).
      */
-    override val dailyWeights: Flow<List<DailyWeightEntity>>
+    override val dailyWeights: Flow<List<DailyWeight>>
         get() {
             try {
                 // Get the user logged-in user's id
@@ -231,6 +236,7 @@ class MilestoneRepository(
                 if (currentUserId < 0)  // There is no current user
                     return flow { listOf<DailyWeightEntity>() }
                 return database.dailyWeightDao.getAllUserWeights(currentUserId)
+                    .map { weightEntities -> weightEntities.map { weightEntity -> weightEntity.toDailyWeight() } }
             } catch (e: Exception) {
                 Log.e(
                     LogCategory.REPOSITORY,
@@ -266,20 +272,21 @@ class MilestoneRepository(
      *
      * @return The current user's latest logged weight or null if the user has none.
      */
-    override suspend fun getLatestLoggedWeight(userId: Long): DailyWeightEntity? {
+    override fun getLatestLoggedWeight(userId: Long): Flow<DailyWeight?> {
         try {
             // Get the user logged-in user's id
             val currentUserId = sharedPref.currentUserId
             if (currentUserId < 0)  // There is no current user
-                return null
+                return flow { }
             return database.dailyWeightDao.getLatestUserWeight(currentUserId)
+                .map { it?.toDailyWeight() }
         } catch (e: Exception) {
             Log.e(
                 LogCategory.REPOSITORY,
                 "There was an error retrieving user's daily weight.\n" + e.message
             )
         }
-        return null
+        return flow { }
 
     }
 

@@ -4,6 +4,8 @@ import com.cs360.weighttracker.data.local.models.DailyWeightEntity
 import com.cs360.weighttracker.data.local.models.UserEntity
 import com.cs360.weighttracker.data.local.status.LoginStatus
 import com.cs360.weighttracker.data.local.status.RegisterStatus
+import com.cs360.weighttracker.domain.models.DailyWeight
+import com.cs360.weighttracker.domain.models.User
 import kotlinx.coroutines.flow.Flow
 
 interface IMilestoneRepository {
@@ -12,7 +14,7 @@ interface IMilestoneRepository {
      *
      * @return A reactive flow of daily weights(List).
      */
-    val dailyWeights: Flow<List<DailyWeightEntity>>
+    val dailyWeights: Flow<List<DailyWeight>>
 
     /**
      * The user's SMS notification setting.
@@ -54,7 +56,7 @@ interface IMilestoneRepository {
      * Retrieves the current logged-in user
      * @return The logged-in user if one exists else null.
      */
-    suspend fun getCurrentUser(): UserEntity?
+    suspend fun getCurrentUser(): User?
 
     /**
      * Logs the user's daily weight.
@@ -94,7 +96,7 @@ interface IMilestoneRepository {
      *
      * @return The current user's latest logged weight or null if the user has none.
      */
-    suspend fun getLatestLoggedWeight(userId: Long): DailyWeightEntity?
+    fun getLatestLoggedWeight(userId: Long): Flow<DailyWeight?>
 
     /**
      * Update the user's phone number.

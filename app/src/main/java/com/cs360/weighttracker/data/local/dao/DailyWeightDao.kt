@@ -21,5 +21,5 @@ interface DailyWeightDao {
     fun getAllUserWeights(userId: Long): Flow<List<DailyWeightEntity>>
 
     @Query("SELECT * FROM dailyWeights WHERE userId = :userId ORDER BY dateTimeMillis DESC LIMIT 1")
-    suspend fun getLatestUserWeight(userId: Long): DailyWeightEntity?
+    fun getLatestUserWeight(userId: Long): Flow<DailyWeightEntity?>
 }
