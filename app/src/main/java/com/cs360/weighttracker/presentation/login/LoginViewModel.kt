@@ -20,12 +20,9 @@ class LoginViewModel(private val repository: IMilestoneRepository) : ViewModel()
         // Query the repository to check if the user is already logged in and if they are
         // then navigate emit login success action
         viewModelScope.launch {
-            val currentUser = repository.getCurrentUser()
-            if (currentUser != null)
-                _state.update { LoginUIState.LogInSuccess }
+            triggerLoginEvent()
         }
     }
-
 
 
     fun onAction(action: LoginActions) {
@@ -41,12 +38,29 @@ class LoginViewModel(private val repository: IMilestoneRepository) : ViewModel()
                     when (result) {
                         LoginStatus.USERNAME_ERROR -> _state.update { LoginUIState.UsernameError }
                         LoginStatus.PASSWORD_ERROR -> _state.update { LoginUIState.PasswordError }
-                        LoginStatus.SUCCESS -> _state.update { LoginUIState.LogInSuccess }
+                        LoginStatus.SUCCESS -> triggerLoginEvent()
                         LoginStatus.UNKNOWN_FAILURE -> _state.update { LoginUIState.UnknownError }
                     }
                 }
             }
         }
+    }
+
+
+    /**
+     * Triggers an appropriate event based on whether the user has a goal set or not.
+     */
+    private suspend fun triggerLoginEvent() {
+        // If login was success check whether the user has a goal set
+        val currentUser = repository.getCurrentUser()
+        currentUser?.let { user ->
+            if (repository.userHasGoalSet(user.userId)) {
+                _state.update { LoginUIState.LogInSuccess }
+                return
+            }
+        }
+        // If not trigger goal not set event
+        _state.update { LoginUIState.GoalNotSet }
     }
 
 
