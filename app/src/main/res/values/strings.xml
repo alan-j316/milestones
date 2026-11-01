@@ -58,7 +58,7 @@
     <string name="invalid_weights">Invalid weight. Try number between 1 and 600.</string>
     <string name="full_name_empty_error">Full name is required.</string>
     <string name="name_update_error">There was an error updating your name.</string>
-    <string name="goal_update_error">There was an error updating your weight goals.</string>
+    <string name="goal_update_error">There was an error updating your information.</string>
     <string name="weight_added_successfully">New weight tracked!</string>
     <string name="delete">Delete</string>
     <string name="navigate_back">Navigate back</string>

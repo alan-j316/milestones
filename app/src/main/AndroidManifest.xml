@@ -48,7 +48,7 @@
             android:windowSoftInputMode="adjustResize">
         </activity>
         <activity
-            android:name=".presentation.GoalsActivity"
+            android:name=".presentation.goals.GoalsActivity"
             android:exported="true"
             android:theme="@style/Theme.WeightTracker"
             android:windowSoftInputMode="adjustResize">

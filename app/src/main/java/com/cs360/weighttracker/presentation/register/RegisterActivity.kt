@@ -21,7 +21,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.cs360.weighttracker.R
-import com.cs360.weighttracker.presentation.GoalsActivity
+import com.cs360.weighttracker.presentation.goals.GoalsActivity
 import com.cs360.weighttracker.presentation.utils.PasswordVisibilityToggler
 import kotlinx.coroutines.launch
 

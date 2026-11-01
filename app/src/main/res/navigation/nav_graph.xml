@@ -10,7 +10,7 @@
         android:label="LoginActivity" />
     <activity
         android:id="@+id/goalsActivity"
-        android:name="com.cs360.weighttracker.presentation.GoalsActivity"
+        android:name="com.cs360.weighttracker.presentation.goals.GoalsActivity"
         android:label="GoalsActivity" />
     <activity
         android:id="@+id/mainActivity"
