@@ -1,4 +1,4 @@
-package com.cs360.weighttracker.presentation;
+package com.cs360.weighttracker.presentation.login;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -22,6 +22,9 @@ import com.cs360.weighttracker.R;
 import com.cs360.weighttracker.database.MilestoneRepository;
 import com.cs360.weighttracker.domain.status.LoginStatus;
 import com.cs360.weighttracker.domain.models.User;
+import com.cs360.weighttracker.presentation.GoalsActivity;
+import com.cs360.weighttracker.presentation.HomeActivity;
+import com.cs360.weighttracker.presentation.register.RegisterActivity;
 import com.cs360.weighttracker.presentation.utils.PasswordVisibilityToggler;
 import com.cs360.weighttracker.presentation.validators.PasswordValidator;
 import com.cs360.weighttracker.presentation.validators.UsernameValidator;

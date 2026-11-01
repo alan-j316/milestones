@@ -29,6 +29,7 @@ import com.cs360.weighttracker.database.MilestoneRepository;
 import com.cs360.weighttracker.domain.models.DailyWeight;
 import com.cs360.weighttracker.domain.models.GoalType;
 import com.cs360.weighttracker.domain.models.User;
+import com.cs360.weighttracker.presentation.login.LoginActivity;
 import com.cs360.weighttracker.presentation.validators.PhoneNumberValidator;
 
 public class ProfileActivity extends AppCompatActivity {

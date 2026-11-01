@@ -1,4 +1,4 @@
-package com.cs360.weighttracker.presentation
+package com.cs360.weighttracker.presentation.register
 
 import android.content.Intent
 import android.graphics.Rect
@@ -21,9 +21,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.cs360.weighttracker.R
-import com.cs360.weighttracker.presentation.actions.AuthActions
-import com.cs360.weighttracker.presentation.states.AuthUiState
-import com.cs360.weighttracker.presentation.states.RegisterUIState
+import com.cs360.weighttracker.presentation.GoalsActivity
 import com.cs360.weighttracker.presentation.utils.PasswordVisibilityToggler
 import kotlinx.coroutines.launch
 
@@ -40,7 +38,7 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var passwordVisibilityToggleButton: ImageButton
     private lateinit var confirmPasswordVisibilityToggleButton: ImageButton
 
-    private val viewModel: MilestonesViewModel by viewModels()
+    private val viewModel: RegisterViewModel by viewModels()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,7 +51,7 @@ class RegisterActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.registerUIState.collect { state ->
+                viewModel.state.collect { state ->
                     when (state) {
                         is RegisterUIState.IsLoading -> {
                             // TODO: Show loader
@@ -220,7 +218,7 @@ class RegisterActivity : AppCompatActivity() {
         val username = usernameEditText.text.toString()
         val password = passwordEditText.text.toString()
         val confirmPassword = confirmPasswordEditText.text.toString()
-        viewModel.onAction(AuthActions.Register(username, password, confirmPassword))
+        viewModel.onAction(RegisterActions.Register(username, password, confirmPassword))
     }
 
     private fun navigateToGoal() {

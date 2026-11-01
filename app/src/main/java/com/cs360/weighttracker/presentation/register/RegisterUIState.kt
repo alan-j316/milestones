@@ -1,4 +1,4 @@
-package com.cs360.weighttracker.presentation.states
+package com.cs360.weighttracker.presentation.register
 
 sealed interface RegisterUIState {
     object IsLoading : RegisterUIState

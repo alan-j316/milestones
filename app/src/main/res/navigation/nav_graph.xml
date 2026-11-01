@@ -6,7 +6,7 @@
     app:startDestination="@id/loginActivity">
     <activity
         android:id="@+id/loginActivity"
-        android:name="com.cs360.weighttracker.presentation.LoginActivity"
+        android:name="com.cs360.weighttracker.presentation.login.LoginActivity"
         android:label="LoginActivity" />
     <activity
         android:id="@+id/goalsActivity"
