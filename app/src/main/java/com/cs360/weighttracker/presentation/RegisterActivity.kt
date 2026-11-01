@@ -3,8 +3,6 @@ package com.cs360.weighttracker.presentation
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -19,11 +17,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.doOnTextChanged
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.cs360.weighttracker.R
-import com.cs360.weighttracker.domain.status.RegisterStatus
+import com.cs360.weighttracker.presentation.actions.AuthActions
+import com.cs360.weighttracker.presentation.states.AuthUiState
+import com.cs360.weighttracker.presentation.states.RegisterUIState
 import com.cs360.weighttracker.presentation.utils.PasswordVisibilityToggler
-import com.cs360.weighttracker.presentation.validators.PasswordValidator
-import com.cs360.weighttracker.presentation.validators.UsernameValidator
+import kotlinx.coroutines.launch
 
 class RegisterActivity : AppCompatActivity() {
     private lateinit var pageTitleTextView: TextView
@@ -41,19 +43,64 @@ class RegisterActivity : AppCompatActivity() {
     private val viewModel: MilestonesViewModel by viewModels()
 
 
-//    var repository: MilestoneRepository? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.enableEdgeToEdge()
         setContentView(R.layout.activity_auth)
 
-        // Attach to application context to ensure the repository share the application's lifetime
-        // not getting recreated for every shared activity.
-//        repository = MilestoneRepository.getInstance(getApplicationContext())
-
         setupUI()
         setupEvents()
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.registerUIState.collect { state ->
+                    when (state) {
+                        is RegisterUIState.IsLoading -> {
+                            // TODO: Show loader
+                        }
+                        is RegisterUIState.RegistrationSuccess -> {
+                            // Navigate to goal activity
+                            navigateToGoal()
+                        }
+                        is RegisterUIState.UsernameError -> {
+                            // Show username error
+                            usernameErrorTextView.text =
+                                applicationContext.getString(R.string.invalid_username)
+                            usernameErrorTextView.visibility = View.VISIBLE
+                        }
+                        is RegisterUIState.PasswordError -> {
+                            // Show password error
+                            passwordErrorTextView.text =
+                                applicationContext.getString(R.string.invalid_password)
+                            passwordErrorTextView.visibility = View.VISIBLE
+                        }
+                        is RegisterUIState.PasswordMismatchError -> {
+                            // Show password mismatch error
+                            confirmPasswordErrorTextView.text =
+                                applicationContext.getString(R.string.mismatched_passwords)
+                            confirmPasswordErrorTextView.visibility = View.VISIBLE
+                        }
+                        RegisterUIState.UserExistsError -> {
+                            Toast.makeText(
+                                this@RegisterActivity,
+                                R.string.user_already_exists,
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                        RegisterUIState.UnknownError -> {
+                            // Show error message
+                            Toast.makeText(
+                                this@RegisterActivity,
+                                R.string.unknown_error_signup,
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+
+
+                    }
+                }
+            }
+        }
     }
 
 
@@ -173,81 +220,13 @@ class RegisterActivity : AppCompatActivity() {
         val username = usernameEditText.text.toString()
         val password = passwordEditText.text.toString()
         val confirmPassword = confirmPasswordEditText.text.toString()
-
-        val isLoginValid = validateLogin(username, password, confirmPassword)
-        if (isLoginValid) {
-            val status = repository!!.registerUser(username, password)
-
-            when (status) {
-                RegisterStatus.USER_EXISTS -> {
-                    usernameErrorTextView.text =
-                        applicationContext.getString(R.string.no_user_match)
-                    usernameErrorTextView.visibility = View.VISIBLE
-                }
-
-                RegisterStatus.SUCCESS ->                     // We are not navigating to goals activity
-                    // since we assume that the user has goal set
-                    // indicated by the login rather than a register.
-                    navigateToGoal()
-
-                RegisterStatus.UNKNOWN_FAILURE -> Toast.makeText(
-                    this,
-                    R.string.unknown_error_signup,
-                    Toast.LENGTH_LONG
-                ).show()
-
-                else -> {}
-            }
-        }
+        viewModel.onAction(AuthActions.Register(username, password, confirmPassword))
     }
 
     private fun navigateToGoal() {
         val intent = Intent(this, GoalsActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
-    }
-
-    /**
-     * TextWatcher for clearing error states when username or password updates.
-     */
-    private inner class ResetErrorStateTextWatcher : TextWatcher {
-        override fun afterTextChanged(editable: Editable?) {
-        }
-
-        override fun beforeTextChanged(charSequence: CharSequence?, i: Int, i1: Int, i2: Int) {
-        }
-
-        override fun onTextChanged(charSequence: CharSequence?, i: Int, i1: Int, i2: Int) {
-            resetErrorState()
-        }
-    }
-
-    private fun validateLogin(
-        username: String?,
-        password: String,
-        confirmPassword: String?
-    ): Boolean {
-        var isValidLogin = true
-        if (!UsernameValidator.validate(username)) {
-            usernameErrorTextView.text = applicationContext.getString(R.string.invalid_username)
-            usernameErrorTextView.visibility = View.VISIBLE
-            isValidLogin = false
-        }
-
-        if (!PasswordValidator.validate(password)) {
-            passwordErrorTextView.text = applicationContext.getString(R.string.invalid_password)
-            passwordErrorTextView.visibility = View.VISIBLE
-            isValidLogin = false
-        }
-
-        if (!PasswordValidator.validate(confirmPassword) || password != confirmPassword) {
-            confirmPasswordErrorTextView.text =
-                applicationContext.getString(R.string.mismatched_passwords)
-            confirmPasswordErrorTextView.visibility = View.VISIBLE
-            isValidLogin = false
-        }
-
-        return isValidLogin
     }
 
 

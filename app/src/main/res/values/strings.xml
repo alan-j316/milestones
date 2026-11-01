@@ -89,4 +89,5 @@
     <string name="no_history">no history</string>
     <string name="no_tracking_history">No Weight History!</string>
     <string name="no_weight_history_text">Your weights will show up here as you start tracking.</string>
+    <string name="user_already_exists">User already exists! Try logging in.</string>
 </resources>
