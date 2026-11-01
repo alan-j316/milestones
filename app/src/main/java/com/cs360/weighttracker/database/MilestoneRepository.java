@@ -5,8 +5,8 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.cs360.weighttracker.data.local.status.LoginStatus;
-import com.cs360.weighttracker.data.local.status.RegisterStatus;
+import com.cs360.weighttracker.domain.status.LoginStatus;
+import com.cs360.weighttracker.domain.status.RegisterStatus;
 import com.cs360.weighttracker.domain.models.DailyWeight;
 import com.cs360.weighttracker.domain.models.User;
 import com.cs360.weighttracker.utils.LogCategory;

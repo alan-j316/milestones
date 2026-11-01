@@ -1,4 +1,4 @@
-package com.cs360.weighttracker.data.local.status
+package com.cs360.weighttracker.domain.status
 
 /**
  * Indicates different registration status and errors from repository layer.

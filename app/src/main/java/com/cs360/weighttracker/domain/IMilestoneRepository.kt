@@ -1,9 +1,7 @@
 package com.cs360.weighttracker.domain
 
-import com.cs360.weighttracker.data.local.models.DailyWeightEntity
-import com.cs360.weighttracker.data.local.models.UserEntity
-import com.cs360.weighttracker.data.local.status.LoginStatus
-import com.cs360.weighttracker.data.local.status.RegisterStatus
+import com.cs360.weighttracker.domain.status.LoginStatus
+import com.cs360.weighttracker.domain.status.RegisterStatus
 import com.cs360.weighttracker.domain.models.DailyWeight
 import com.cs360.weighttracker.domain.models.User
 import kotlinx.coroutines.flow.Flow

@@ -21,7 +21,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.cs360.weighttracker.database.MilestoneRepository;
-import com.cs360.weighttracker.data.local.status.RegisterStatus;
+import com.cs360.weighttracker.domain.status.RegisterStatus;
 import com.cs360.weighttracker.utils.PasswordVisibilityToggler;
 import com.cs360.weighttracker.validators.PasswordValidator;
 import com.cs360.weighttracker.validators.UsernameValidator;
