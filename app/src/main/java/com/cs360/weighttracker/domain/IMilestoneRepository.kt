@@ -1,4 +1,4 @@
-package com.cs360.weighttracker.domain.models
+package com.cs360.weighttracker.domain
 
 import com.cs360.weighttracker.data.local.models.DailyWeightEntity
 import com.cs360.weighttracker.data.local.models.UserEntity

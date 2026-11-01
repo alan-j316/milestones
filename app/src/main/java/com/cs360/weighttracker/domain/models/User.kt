@@ -10,7 +10,7 @@ data class User(
     val passwordHash: String,
     val fullName: String = "",
     val goalWeight: Float = 0.0f,
-    val dailyWeight: Float = 0.0f,
+    val currentWeight: Float = 0.0f,
     val phoneNumber: String = "",
     var userId: Long,
 ) {
@@ -24,4 +24,17 @@ data class User(
      * Returns whether this user has a phone number.
      */
     fun hasPhoneNumber(): Boolean = phoneNumber.isNotBlank();
+
+    /**
+     * Returns user goals given the current goal and target weights.
+     */
+    fun getGoalType(): GoalType {
+        return if (goalWeight > currentWeight) {
+            GoalType.WEIGHT_GAIN
+        } else if (goalWeight < currentWeight) {
+            GoalType.WEIGHT_LOSS
+        } else {
+            GoalType.WEIGHT_MAINTAIN
+        }
+    }
 }
