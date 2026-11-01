@@ -7,6 +7,7 @@ import com.cs360.weighttracker.data.local.models.DailyWeightEntity
 import com.cs360.weighttracker.data.local.models.UserEntity
 import com.cs360.weighttracker.data.local.status.LoginStatus
 import com.cs360.weighttracker.data.local.status.RegisterStatus
+import com.cs360.weighttracker.domain.models.IMilestoneRepository
 import com.cs360.weighttracker.utils.LogCategory
 import com.cs360.weighttracker.utils.PasswordHasher
 import kotlinx.coroutines.flow.Flow
@@ -16,7 +17,7 @@ import kotlinx.coroutines.flow.flow
 class MilestoneRepository(
     private val database: MilestonesDatabase,
     private val sharedPref: MilestonesSharedPref
-) {
+) : IMilestoneRepository {
 
     ///------------------------
     ///       USER AUTH
@@ -29,7 +30,7 @@ class MilestoneRepository(
      * @param password The password of the user.
      * @return LoginStatus indicating whether the login was successful or not.
      */
-    suspend fun loginUser(username: String, password: String): LoginStatus {
+    override suspend fun loginUser(username: String, password: String): LoginStatus {
         val hashedPassword = PasswordHasher.hash(password)
         val user = UserEntity(username, hashedPassword)
         try {
@@ -64,7 +65,7 @@ class MilestoneRepository(
      * @param password The password of the user.
      * @return RegisterStatus indicating whether the registration was successful or not.
      */
-    suspend fun registerUser(username: String, password: String): RegisterStatus {
+    override suspend fun registerUser(username: String, password: String): RegisterStatus {
         val hashedPassword = PasswordHasher.hash(password)
         try {
             // Check whether the user exists in the database.
@@ -94,7 +95,7 @@ class MilestoneRepository(
     /**
      * Logs out the current user.
      */
-    fun logoutUser() {
+    override fun logoutUser() {
         // Delete the user's session
         sharedPref.deleteCurrentUserId()
         // And clear user's preference as well
@@ -107,7 +108,7 @@ class MilestoneRepository(
      * @param fullName The name to update to.
      * @return Boolean indicating whether the update was successful or not.
      */
-    suspend fun updateCurrentUserFullName(fullName: String): Boolean {
+    override suspend fun updateCurrentUserFullName(fullName: String): Boolean {
         try {
             // Get the user logged-in user's id
             val currentUserId = sharedPref.currentUserId
@@ -131,7 +132,7 @@ class MilestoneRepository(
      * Retrieves the current logged-in user
      * @return The logged-in user if one exists else null.
      */
-    suspend fun getCurrentUser(): UserEntity? {
+    override suspend fun getCurrentUser(): UserEntity? {
         try {
             // Get the user logged-in user's id
             val currentUserId = sharedPref.currentUserId
@@ -154,7 +155,7 @@ class MilestoneRepository(
      * @param weight Today's weight to log.
      * @return A boolean whether the weight logging was successful.
      */
-    suspend fun logDailyWeight(weight: Float): Boolean {
+    override suspend fun logDailyWeight(weight: Float): Boolean {
         try {
             // Get the user logged-in user's id
             val currentUserId = sharedPref.currentUserId
@@ -177,7 +178,7 @@ class MilestoneRepository(
      * @param id The id of the daily weight to delete.
      * @return A boolean indicating whether the weight was deleted.
      */
-    suspend fun deleteDailyWeight(id: Long): Boolean {
+    override suspend fun deleteDailyWeight(id: Long): Boolean {
         try {
             return database.dailyWeightDao.delete(id) > 0
         } catch (e: Exception) {
@@ -194,7 +195,7 @@ class MilestoneRepository(
      * @param goalWeight    The user's goal weight.
      * @return A boolean indicating whether the goal weight was upserted.
      */
-    suspend fun upsertGoalWeight(currentWeight: Float, goalWeight: Float): Boolean {
+    override suspend fun upsertGoalWeight(currentWeight: Float, goalWeight: Float): Boolean {
         try {
             // NOTE: Upsert logic is handled by the database so there is no need to check it here
             // Get the user logged-in user's id
@@ -222,7 +223,7 @@ class MilestoneRepository(
      *
      * @return A reactive flow of daily weights(List).
      */
-    val dailyWeights: Flow<List<DailyWeightEntity>>
+    override val dailyWeights: Flow<List<DailyWeightEntity>>
         get() {
             try {
                 // Get the user logged-in user's id
@@ -246,7 +247,7 @@ class MilestoneRepository(
      * @param userId The current user's id.
      * @return A boolean whether the user has a goal weight.
      */
-    suspend fun userHasGoalSet(userId: Long): Boolean {
+    override suspend fun userHasGoalSet(userId: Long): Boolean {
         try {
             val user = database.userDao.getUser(userId);
             return if (user == null) false else user.goalWeight >= 0.0f
@@ -265,7 +266,7 @@ class MilestoneRepository(
      *
      * @return The current user's latest logged weight or null if the user has none.
      */
-    suspend fun getLatestLoggedWeight(userId: Long): DailyWeightEntity? {
+    override suspend fun getLatestLoggedWeight(userId: Long): DailyWeightEntity? {
         try {
             // Get the user logged-in user's id
             val currentUserId = sharedPref.currentUserId
@@ -288,7 +289,7 @@ class MilestoneRepository(
      *
      * @return A boolean indicating whether the operation was successful.
      */
-    suspend fun setPhoneNumber(phoneNumber: String): Boolean {
+    override suspend fun setPhoneNumber(phoneNumber: String): Boolean {
         try {
             // Unsetting a phone number is not possible
             if (phoneNumber.isEmpty()) return false
@@ -311,7 +312,7 @@ class MilestoneRepository(
     /**
      * The user's SMS notification setting.
      */
-    var userNotificationSetting: Boolean
+    override var userNotificationSetting: Boolean
         get() = sharedPref.smsSetting ?: false
         set(value: Boolean) {
             sharedPref.smsSetting = value

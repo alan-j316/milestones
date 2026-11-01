@@ -9,6 +9,8 @@ data class User(
     val userName: String,
     val passwordHash: String,
     val fullName: String = "",
+    val goalWeight: Float = 0.0f,
+    val dailyWeight: Float = 0.0f,
     val phoneNumber: String = "",
     var userId: Long,
 ) {
