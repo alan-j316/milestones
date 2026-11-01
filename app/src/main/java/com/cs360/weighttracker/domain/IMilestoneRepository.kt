@@ -82,6 +82,16 @@ interface IMilestoneRepository {
     suspend fun upsertGoalWeight(currentWeight: Float, goalWeight: Float): Boolean
 
     /**
+     * Updates user's full name, and current and goal weight.
+     *
+     * @param fullName      The user's full name.
+     * @param currentWeight The user's current weight.
+     * @param goalWeight    The user's goal weight.
+     * @return A boolean indicating whether the goal weight was upserted.
+     */
+    suspend fun updateUserInfo(fullName: String, currentWeight: Float, goalWeight: Float): Boolean
+
+    /**
      * Gets whether the user has a goal weight set.
      *
      * @param userId The current user's id.

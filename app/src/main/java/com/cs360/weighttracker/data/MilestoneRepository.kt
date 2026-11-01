@@ -222,6 +222,33 @@ class MilestoneRepository(
         return false
     }
 
+    override suspend fun updateUserInfo(
+        fullName: String,
+        currentWeight: Float,
+        goalWeight: Float
+    ): Boolean {
+        try {
+            // NOTE: Upsert logic is handled by the database so there is no need to check it here
+            // Get the user logged-in user's id
+            val currentUserId = sharedPref.currentUserId
+            if (currentUserId < 0)  // There is no current user
+                return false
+            val user = database.userDao.getUser(currentUserId)
+            checkNotNull(user) { "User not logged in!" }
+
+            return database.userDao.upsert(
+                user.copy(
+                    fullName = fullName,
+                    currentWeight = currentWeight,
+                    goalWeight = goalWeight
+                )
+            ) >= 0
+        } catch (e: Exception) {
+            Log.e(LogCategory.REPOSITORY, "There was error logging the user weight!\n" + e.message)
+        }
+        return false
+    }
+
 
     /**
      * All the logged daily weights for the current user.

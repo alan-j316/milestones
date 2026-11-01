@@ -36,8 +36,20 @@ class GoalsViewModel(private val repository: IMilestoneRepository) : ViewModel()
             is GoalsActions.Save -> {
                 viewModelScope.launch {
                     _state.update { GoalsUIState.IsLoading }
-//                    val result = repository.updateUserData(action.fullName, action.currentWeight,action.goalWeight)
-
+                    val (fullName, currentWeight, goalWeight) = action
+                    if (!validateInputs(fullName, currentWeight, goalWeight))
+                        return@launch
+                    val result = repository.updateUserInfo(
+                        action.fullName,
+                        action.currentWeight,
+                        action.goalWeight
+                    )
+                    if (!result) {
+                        // Operation failed
+                        _state.update { GoalsUIState.SaveError }
+                    } else {
+                        _state.update { GoalsUIState.SaveSuccess }
+                    }
                 }
             }
         }
