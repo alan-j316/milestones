@@ -6,18 +6,17 @@ import com.cs360.weighttracker.domain.IMilestoneRepository
 import com.cs360.weighttracker.domain.models.GoalType
 import com.cs360.weighttracker.domain.models.User
 import com.cs360.weighttracker.presentation.shared.UserData
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class HomeViewModel(private val repository: IMilestoneRepository) : ViewModel() {
 
-    private var _state = MutableStateFlow<HomeUIState>(HomeUIState.IsLoading)
-    val state = _state.asStateFlow()
+    private var _state = Channel<HomeUIState>()
+    val state = _state.receiveAsFlow()
 
     // Daily Weights Flow State
     val dailyWeights = repository.dailyWeights.stateIn(
@@ -39,20 +38,20 @@ class HomeViewModel(private val repository: IMilestoneRepository) : ViewModel() 
 
         when (action) {
             is HomeActions.DeleteWeight -> {
-                _state.update { HomeUIState.IsLoading }
                 viewModelScope.launch {
+                    _state.send(HomeUIState.IsLoading)
                     val deleteSuccess = repository.deleteDailyWeight(action.id)
                     if (deleteSuccess) {
-                        _state.update { HomeUIState.WeightDeleted }
+                        _state.send(HomeUIState.WeightDeleted)
                     } else {
-                        _state.update { HomeUIState.WeightDeleteError }
+                        _state.send(HomeUIState.WeightDeleteError)
                     }
                 }
             }
 
             is HomeActions.TrackWeight -> {
-                _state.update { HomeUIState.IsLoading }
                 viewModelScope.launch {
+                    _state.send(HomeUIState.IsLoading)
                     val weightLogged = repository.logDailyWeight(action.weight)
                     if (weightLogged) {
                         // Check whether the goal weight was achieved. If so,
@@ -60,18 +59,18 @@ class HomeViewModel(private val repository: IMilestoneRepository) : ViewModel() 
                         val user = userData.value.user ?: return@launch
                         if (hasReachGoalWeight(action.weight, user)) {
                             val shouldSendSms = smsPreference.value
-                            _state.update {
+                            _state.send(
                                 HomeUIState.GoalWeightReached(
                                     action.weight,
                                     shouldSendSms
                                 )
-                            }
+                            )
                         } else {
-                            _state.update { HomeUIState.WeightTracked(action.weight) }
+                            _state.send(HomeUIState.WeightTracked(action.weight))
                         }
                     } else {
                         // Error logging the weight.
-                        _state.update { HomeUIState.WeightTrackingError }
+                        _state.send(HomeUIState.WeightTrackingError)
                     }
                 }
             }
