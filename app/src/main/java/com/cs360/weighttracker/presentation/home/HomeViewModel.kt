@@ -31,7 +31,7 @@ class HomeViewModel(private val repository: IMilestoneRepository) : ViewModel() 
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), initialValue = UserData())
 
     var smsPreference = repository.getSMSSetting()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
 
     fun onAction(action: HomeActions) {
