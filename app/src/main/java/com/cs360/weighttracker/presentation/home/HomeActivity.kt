@@ -25,13 +25,13 @@ import com.cs360.weighttracker.presentation.Constants
 import com.cs360.weighttracker.presentation.ProfileActivity
 import com.cs360.weighttracker.presentation.components.AddWeightDialog
 import com.cs360.weighttracker.presentation.components.DeleteWeightItemDialog
-import com.cs360.weighttracker.presentation.components.DialogClickListener
 import com.cs360.weighttracker.presentation.components.WeightItemAdapter
 import com.cs360.weighttracker.presentation.utils.TimeUtils
 import kotlinx.coroutines.launch
 import java.lang.Exception
 import kotlin.jvm.java
-import com.cs360.weighttracker.presentation.components.WeightItemRemoveListener
+import kotlin.math.max
+import kotlin.math.min
 
 
 class HomeActivity : AppCompatActivity() {
@@ -160,9 +160,9 @@ class HomeActivity : AppCompatActivity() {
                     currentWeightTextView.text = getString(
                         R.string.weight_format, currentWeight
                     )
-                    // TODO: Add back
-//                    val progress = getProgress(weight.weight)
-//                    weightProgressBar.progress = progress
+                    // Update the progress
+                    val progress = getProgress(weight?.weight)
+                    weightProgressBar.progress = progress
                 }
             }
 
@@ -222,33 +222,40 @@ class HomeActivity : AppCompatActivity() {
 
     }
 
-// TODO: Add back
-//    /**
-//     * Gets the current weight progress given the user's goals and latest logged weight.
-//     *
-//     * @param currentWeight The latest logged weight.
-//     * @return A number from 0 to 100 indicating the weight progress.
-//     */
-//    private fun getProgress(currentWeight: Float): Int {
-//        var progress = 0
-//        if (userGoal.getGoalType() === GoalType.WEIGHT_LOSS) {
-//            // Get current weight returns the user's initial weight
-//            // and we compare it the user's logged weight to get the progress
-//            val weightLost: Float = userGoal.getCurrentWeight() - currentWeight
-//            val goalTotal: Float = userGoal.getCurrentWeight() - userGoal.getGoalWeight()
-//            val progressPercentage = (weightLost / goalTotal * 100).toInt()
-//            progress = kotlin.math.max(0, kotlin.math.min(100, progressPercentage))
-//        } else {
-//            // For weight gain the current weight will be greater than the initial weight
-//            // else the progress will show negative values.
-//            val weightGained: Float = currentWeight - userGoal.getCurrentWeight()
-//            val goalTotal: Float = userGoal.getGoalWeight() - userGoal.getCurrentWeight()
-//
-//            val progressPercentage = (weightGained / goalTotal * 100).toInt()
-//            progress = kotlin.math.max(0, kotlin.math.min(100, progressPercentage))
-//        }
-//        return progress
-//    }
+
+    /**
+     * Gets the current weight progress given the user's goals and latest logged weight.
+     *
+     * @param weight The latest logged weight.
+     * @return A number from 0 to 100 indicating the weight progress.
+     */
+    private fun getProgress(weight: Float?): Int {
+        weight?.let {
+            val user = viewModel.currentUser;
+
+            var progress: Int
+            if (user.getGoalType() == GoalType.WEIGHT_LOSS) {
+                // Get current weight returns the user's initial weight,
+                // and we compare it the user's logged weight to get the progress
+                val weightLost: Float = user.currentWeight - weight
+                val goalTotal: Float = user.currentWeight - user.currentWeight
+                val progressPercentage = (weightLost / goalTotal * 100).toInt()
+                progress = max(0, min(100, progressPercentage))
+            } else {
+                // For weight gain the current weight will be greater than the initial weight
+                // else the progress will show negative values.
+                val weightGained: Float = weight - user.currentWeight
+                val goalTotal: Float = user.goalWeight - user.currentWeight
+
+                val progressPercentage = (weightGained / goalTotal * 100).toInt()
+                progress = kotlin.math.max(0, kotlin.math.min(100, progressPercentage))
+            }
+            return progress
+        }
+
+        // Return 0 if the current weight is null.
+        return 0
+    }
 
 
 // TODO: Remove
