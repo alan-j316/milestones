@@ -21,6 +21,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SwitchCompat
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.Lifecycle
@@ -41,7 +42,7 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var numberTextView: TextView
     private lateinit var weightChangeProgressBar: ProgressBar
 
-    private lateinit var notificationSwitch: Switch
+    private lateinit var notificationSwitch: SwitchCompat
     private lateinit var updateProfileButton: Button
     private lateinit var logoutButton: Button
     private lateinit var updateNumberButton: Button
