@@ -8,6 +8,13 @@ sealed interface HomeUIState {
         val user: User
     ) : HomeUIState
 
-    data class GoalWeightReached(val fullName: String, val goalWeight: Float) : HomeUIState
-    data class TrackWeight(val weight: Float)
+    object WeightDeleted : HomeUIState
+
+    // GoalWeightReached and WeightTracked events as mutually exclusive states.
+    // They should NOT be triggered sequentially, as WeightTracked indicates
+    // the user has finished tracking their weights and hence should only save the weight.
+    // GoalWeightReached is also triggered after the same events(user saving the weight)
+    // but requires the newly tracked weight to at least be equal to their goal weight.
+    data class GoalWeightReached(val weight: Float, val sendSms: Boolean) : HomeUIState
+    data class WeightTracked(val weight: Float) : HomeUIState
 }

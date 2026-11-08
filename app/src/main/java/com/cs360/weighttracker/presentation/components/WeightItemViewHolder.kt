@@ -19,14 +19,14 @@ class WeightItemViewHolder(inflater: LayoutInflater, parent: ViewGroup?) :
         itemView.findViewById(R.id.btnHistoryItemDelete)
 
 
-    fun bind(weight: DailyWeight, onDeleteListener: WeightItemRemoveListener) {
+    fun bind(weight: DailyWeight, onWeightDelete: (id: Long) -> Unit) {
         dateTextView.text = fromMillis(weight.dateTimeMillis)
 
         //        weightTextView.setText(String.valueOf(weight.getUserWeight()));
-        weightTextView.text = format(weight.userWeight)
+        weightTextView.text = format(weight.weight)
         // Attach the on delete method call.
         deleteWeightItemButton.setOnClickListener { _: View? ->
-            onDeleteListener.onRemove(
+            onWeightDelete(
                 weight.id
             )
         }

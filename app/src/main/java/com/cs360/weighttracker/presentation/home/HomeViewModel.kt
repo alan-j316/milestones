@@ -3,6 +3,7 @@ package com.cs360.weighttracker.presentation.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cs360.weighttracker.domain.IMilestoneRepository
+import com.cs360.weighttracker.domain.models.GoalType
 import com.cs360.weighttracker.domain.models.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -37,6 +38,24 @@ class HomeViewModel(private val repository: IMilestoneRepository) : ViewModel() 
 
         when (action) {
             is HomeActions.DeleteWeight -> TODO()
+        }
+    }
+
+
+    /**
+     * Returns whether the user has reached a goal weight depending on the type of goal(loss/gain).
+     * @param newWeight The latest logged weight.
+     * @return True if the user has reached their goal weight.
+     * @return False otherwise.
+     */
+    private fun hasReachGoalWeight(newWeight: Float): Boolean {
+        val weightGoal: Float = currentUser.goalWeight
+        // In case of weight gain we need to check if current logged weight is greater or equal to
+        // the goal weight and weight loss if the logged weight is less than or equal
+        return if (currentUser.getGoalType() === GoalType.WEIGHT_GAIN) {
+            newWeight >= weightGoal
+        } else {
+            newWeight <= weightGoal
         }
     }
 

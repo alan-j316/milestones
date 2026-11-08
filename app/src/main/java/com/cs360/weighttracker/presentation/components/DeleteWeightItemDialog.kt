@@ -7,14 +7,14 @@ import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import com.cs360.weighttracker.R
 
-class DeleteWeightItemDialog(var clickListener: DialogClickListener) : DialogFragment() {
+class DeleteWeightItemDialog(private val onDelete: () -> Unit) : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         // Build an alert dialog with a title, dismiss, and positive actions
         val builder = AlertDialog.Builder(activity)
         builder.setMessage(R.string.delete_weight_recording)
             .setPositiveButton(
                 R.string.delete
-            ) { _: DialogInterface?, _: Int -> this.clickListener.onPositiveAction() }
+            ) { _: DialogInterface?, _: Int -> onDelete() }
             .setNegativeButton(
                 R.string.cancel
             ) { _: DialogInterface?, _: Int -> dismiss() }
