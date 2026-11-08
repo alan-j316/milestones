@@ -31,11 +31,10 @@ import com.cs360.weighttracker.domain.models.GoalType
 import com.cs360.weighttracker.presentation.Constants
 import com.cs360.weighttracker.presentation.goals.GoalsActivity
 import com.cs360.weighttracker.presentation.login.LoginActivity
+import com.cs360.weighttracker.presentation.utils.getProgress
 import com.cs360.weighttracker.presentation.validators.PhoneNumberValidator
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import kotlin.math.max
-import kotlin.math.min
 
 class ProfileActivity : AppCompatActivity() {
     private lateinit var weightProgressTextView: TextView
@@ -143,29 +142,24 @@ class ProfileActivity : AppCompatActivity() {
                         // If the user has not logged weight use the initial weight as the current weight
                         val currentWeight: Float = weight?.weight ?: currentGoal
 
+                        weightChangeProgressBar.progress = getProgress(user, currentWeight)
+
                         if (user.getGoalType() === GoalType.WEIGHT_LOSS) {
                             // Get current weight returns the user's initial weight,
                             // and we compare it the user's logged weight to get the progress
-                            val weightLost: Float = currentGoal - currentWeight
-                            val goalTotal: Float = currentGoal - currentGoal
+                            val weightLost: Float = user.currentWeight - currentWeight
+                            val goalTotal: Float = user.currentWeight - user.currentWeight
                             weightProgressTextView.text = getString(
                                 R.string.weight_loss_progress, weightLost, goalTotal
                             )
-                            val progressPercentage = (weightLost / goalTotal * 100).toInt()
-                            val progress = max(0, min(100, progressPercentage))
-                            weightChangeProgressBar.progress = progress
                         } else {
                             // For weight gain the current weight will be greater than the initial weight
                             // else the progress will show negative values.
-                            val weightGained: Float = currentWeight - currentGoal
-                            val goalTotal: Float = currentGoal - currentGoal
+                            val weightGained: Float = currentWeight - user.currentWeight
+                            val goalTotal: Float = user.goalWeight - user.currentWeight
                             weightProgressTextView.text = getString(
                                 R.string.weight_gain_progress, weightGained, goalTotal
                             )
-
-                            val progressPercentage = (weightGained / goalTotal * 100).toInt()
-                            val progress = max(0, min(100, progressPercentage))
-                            weightChangeProgressBar.progress = progress
                         }
 
                         // Update user information

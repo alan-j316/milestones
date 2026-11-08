@@ -7,7 +7,7 @@ import com.cs360.weighttracker.domain.status.LoginStatus
 import com.cs360.weighttracker.presentation.validators.PasswordValidator
 import com.cs360.weighttracker.presentation.validators.UsernameValidator
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
@@ -49,7 +49,7 @@ class LoginViewModel(private val repository: IMilestoneRepository) : ViewModel()
      */
     private suspend fun triggerLoginEvent() {
         // If login was success check whether the user has a goal set
-        val currentUser = repository.getCurrentUser().first()
+        val currentUser = repository.getCurrentUser().firstOrNull()
         currentUser?.let { user ->
             if (repository.userHasGoalSet(user.userId)) {
                 _state.send(LoginUIState.LogInSuccess)
