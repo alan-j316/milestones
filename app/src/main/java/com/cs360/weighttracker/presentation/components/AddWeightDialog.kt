@@ -9,8 +9,10 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.viewModels
 import com.cs360.weighttracker.R
-import com.cs360.weighttracker.presentation.Constants
+import com.cs360.weighttracker.presentation.home.HomeActions
+import com.cs360.weighttracker.presentation.home.HomeViewModel
 import com.cs360.weighttracker.presentation.validators.WeightValidator.validate
 
 class AddWeightDialog : DialogFragment() {
@@ -18,6 +20,8 @@ class AddWeightDialog : DialogFragment() {
     private lateinit var cancelButton: Button
     private lateinit var logWeightButton: Button
     private lateinit var weightErrorTextView: TextView
+
+    val viewModel by viewModels<HomeViewModel>()
 
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -49,23 +53,21 @@ class AddWeightDialog : DialogFragment() {
      * Sets up the event listeners necessary for all the views.
      */
     private fun setupEvents() {
-        // Finish will pop off this activity from the backstack leaving only with the Login activity
-        // from the navigation will take place
-        // Since the events listeners only trigger for one textbox,
-        // I've decided to keep it simple rather than split it into functions like the other
-        // activities
-        logWeightButton.setOnClickListener { view: View? ->
+        logWeightButton.setOnClickListener { _: View? ->
             val weightStr = weightEditText.text.toString()
             try {
                 val weight = weightStr.toFloat()
                 if (!validate(weight)) throw Exception("Illegal weight value")
+
+                viewModel.onAction(HomeActions.TrackWeight(weight))
+                // TODO: REMOVE
                 // Save the result in a bundle so we can share it to the parent view (Home Activity)
-                val result = Bundle()
-                result.putFloat(Constants.NEW_WEIGHT_BUNDLE_KEY, weight)
-                getParentFragmentManager().setFragmentResult(
-                    Constants.ADD_NEW_WEIGHT_DIALOG,
-                    result
-                )
+//                val result = Bundle()
+//                result.putFloat(Constants.NEW_WEIGHT_BUNDLE_KEY, weight)\
+//                getParentFragmentManager().setFragmentResult(
+//                    Constants.ADD_NEW_WEIGHT_DIALOG,
+//                    result
+//                )
 
                 // Dismiss the dialog
                 dismiss()

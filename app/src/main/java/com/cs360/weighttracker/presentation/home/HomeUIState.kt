@@ -10,6 +10,10 @@ sealed interface HomeUIState {
 
     object WeightDeleted : HomeUIState
 
+    // Error states
+    object WeightTrackingError : HomeUIState
+    object WeightDeleteError : HomeUIState
+
     // GoalWeightReached and WeightTracked events as mutually exclusive states.
     // They should NOT be triggered sequentially, as WeightTracked indicates
     // the user has finished tracking their weights and hence should only save the weight.

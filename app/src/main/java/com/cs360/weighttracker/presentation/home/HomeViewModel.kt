@@ -7,9 +7,10 @@ import com.cs360.weighttracker.domain.models.GoalType
 import com.cs360.weighttracker.domain.models.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class HomeViewModel(private val repository: IMilestoneRepository) : ViewModel() {
 
@@ -30,14 +31,57 @@ class HomeViewModel(private val repository: IMilestoneRepository) : ViewModel() 
         replay = 1
     )
 
-    lateinit var currentUser: User // TODO: Init user
+    lateinit var currentUser: User
         private set
+
+    init {
+        viewModelScope.launch {
+            // At this point current user must not be null
+            // and if it is null, user has either logged out in which case
+            // it is an invalid state or there was some hardware error or exception
+            currentUser = repository.getCurrentUser()!!
+        }
+    }
 
 
     fun onAction(action: HomeActions) {
 
         when (action) {
-            is HomeActions.DeleteWeight -> TODO()
+            is HomeActions.DeleteWeight -> {
+                _state.update { HomeUIState.IsLoading }
+                viewModelScope.launch {
+                    val deleteSuccess = repository.deleteDailyWeight(action.id)
+                    if(deleteSuccess) {
+                        _state.update { HomeUIState.WeightDeleted }
+                    } else {
+                        _state.update { HomeUIState.WeightDeleteError }
+                    }
+                }
+            }
+            is HomeActions.TrackWeight -> {
+                _state.update { HomeUIState.IsLoading }
+                viewModelScope.launch {
+                    val weightLogged = repository.logDailyWeight(action.weight)
+                    if (weightLogged) {
+                        // Check whether the goal weight was achieved. If so,
+                        // trigger the related event, and if not trigger weight added event.
+                        if (hasReachGoalWeight(action.weight)) {
+                            val shouldSendSms = repository.userNotificationSetting
+                            _state.update {
+                                HomeUIState.GoalWeightReached(
+                                    action.weight,
+                                    shouldSendSms
+                                )
+                            }
+                        } else {
+                            _state.update { HomeUIState.WeightTracked(action.weight) }
+                        }
+                    } else {
+                        // Error logging the weight.
+                        _state.update { HomeUIState.WeightTrackingError }
+                    }
+                }
+            }
         }
     }
 
