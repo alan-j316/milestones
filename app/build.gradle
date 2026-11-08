@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.ksp) apply false
+    alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.koin.compiler)
 }
 
@@ -42,7 +42,7 @@ android {
 
     kotlin {
         compilerOptions {
-            languageVersion = KotlinVersion.KOTLIN_2_0
+            languageVersion = KotlinVersion.KOTLIN_2_3
             // Optional: Set jvmTarget
             // jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11
         }
@@ -57,13 +57,14 @@ dependencies {
     implementation libs.navigation.fragment
     implementation libs.navigation.ui
     implementation libs.recyclerview
-    implementation libs.room
     // Koin DI
     implementation platform(libs.koin.bom)
     implementation libs.koin.core
     implementation libs.koin.android
-
-    annotationProcessor libs.room.compiler
+    // Room
+    implementation libs.room
+    implementation libs.room.ktx
+    ksp libs.room.compiler
 
     // Unit Tests
     testImplementation libs.junit
