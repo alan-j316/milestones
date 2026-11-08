@@ -22,7 +22,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.cs360.weighttracker.R
 import com.cs360.weighttracker.domain.models.GoalType
 import com.cs360.weighttracker.presentation.Constants
-import com.cs360.weighttracker.presentation.ProfileActivity
+import com.cs360.weighttracker.presentation.profile.ProfileActivity
 import com.cs360.weighttracker.presentation.components.AddWeightDialog
 import com.cs360.weighttracker.presentation.components.DeleteWeightItemDialog
 import com.cs360.weighttracker.presentation.components.WeightItemAdapter
@@ -149,6 +149,9 @@ class HomeActivity : AppCompatActivity() {
                                 R.string.weight_format, user.goalWeight
                             )
                         }
+
+                        HomeUIState.WeightDeleteError -> TODO()
+                        HomeUIState.WeightTrackingError -> TODO()
                     }
                 }
             }

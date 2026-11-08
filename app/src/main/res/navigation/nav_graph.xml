@@ -18,6 +18,6 @@
         android:label="MainActivity" />
     <activity
         android:id="@+id/profileActivity"
-        android:name="com.cs360.weighttracker.presentation.ProfileActivity"
+        android:name="com.cs360.weighttracker.presentation.profile.ProfileActivity"
         android:label="ProfileActivity" />
 </navigation>
