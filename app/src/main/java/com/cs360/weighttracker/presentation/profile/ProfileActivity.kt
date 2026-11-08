@@ -11,6 +11,7 @@ import android.widget.Button
 import android.widget.CompoundButton
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -22,6 +23,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -46,6 +48,7 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var logoutButton: Button
     private lateinit var updateNumberButton: Button
     private lateinit var navigateBackButton: ImageButton
+    private lateinit var loadingLayout: LinearLayout
 
     private val viewModel: ProfileViewModel by viewModel()
 
@@ -79,9 +82,17 @@ class ProfileActivity : AppCompatActivity() {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.state.collect { state ->
+
+                        val loading = state is ProfileUIState.IsLoading
+                        loadingLayout.isVisible = loading
+                        logoutButton.isEnabled = !loading
+                        updateProfileButton.isEnabled = !loading
+                        navigateBackButton.isEnabled = !loading
+                        updateProfileButton.isEnabled = !loading
+
                         when (state) {
                             ProfileUIState.IsLoading -> {
-                                // TODO: Add loading state
+                                // Handled above
                             }
 
                             ProfileUIState.LogoutError -> {
@@ -211,6 +222,7 @@ class ProfileActivity : AppCompatActivity() {
         notificationSwitch = findViewById(R.id.switchProfileNotificationSetting)
         numberTextView = findViewById(R.id.tvProfileNotificationNumber)
         updateNumberButton = findViewById(R.id.btnProfileUpdateNumber)
+        loadingLayout = findViewById(R.id.loadingProfileLayout)
     }
 
 

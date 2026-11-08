@@ -14,13 +14,12 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.RecyclerView
 import com.cs360.weighttracker.R
-import com.cs360.weighttracker.domain.models.GoalType
-import com.cs360.weighttracker.domain.models.User
 import com.cs360.weighttracker.presentation.Constants
 import com.cs360.weighttracker.presentation.components.AddWeightDialog
 import com.cs360.weighttracker.presentation.components.DeleteWeightItemDialog
@@ -30,8 +29,6 @@ import com.cs360.weighttracker.presentation.utils.TimeUtils
 import com.cs360.weighttracker.presentation.utils.getProgress
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import kotlin.math.max
-import kotlin.math.min
 
 
 class HomeActivity : AppCompatActivity() {
@@ -47,6 +44,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var adapter: WeightItemAdapter
     private lateinit var noWeightsLayout: LinearLayout
 
+    private lateinit var loadingLayout: LinearLayout
     private val viewModel: HomeViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,9 +60,13 @@ class HomeActivity : AppCompatActivity() {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.state.collect { state ->
+                        val loading = state is HomeUIState.IsLoading
+                        loadingLayout.isVisible = loading
+                        trackWeightButton.isEnabled = !loading
+
                         when (state) {
                             HomeUIState.IsLoading -> {
-                                // TODO: Add loading spinner
+                                // Handled above
                             }
 
                             is HomeUIState.WeightTracked -> {
@@ -219,6 +221,7 @@ class HomeActivity : AppCompatActivity() {
         profileImage = findViewById(R.id.imgHomeProfile)
         weightProgressBar = findViewById(R.id.pbHomeWeightChange)
         noWeightsLayout = findViewById(R.id.layoutHomeNoHistory)
+        loadingLayout = findViewById(R.id.loadingHomeLayout)
 
         adapter = WeightItemAdapter { itemId: Long ->
             // For deleting the weight, to provide the user with a chance to rethink their

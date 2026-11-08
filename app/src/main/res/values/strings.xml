@@ -98,4 +98,5 @@
     <string name="log_out_error">There was an error logging out! Please try again after sometime.</string>
     <string name="track_weight_error">There was an error tracking your weight!</string>
     <string name="delete_weight_error">There was an error deleting the weight!</string>
+    <string name="loading">Loading...</string>
 </resources>

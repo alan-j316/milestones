@@ -12,17 +12,16 @@ import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.cs360.weighttracker.R
 import com.cs360.weighttracker.presentation.goals.GoalsActivity
-import com.cs360.weighttracker.presentation.login.LoginUIState
 import com.cs360.weighttracker.presentation.utils.PasswordVisibilityToggler
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -40,6 +39,7 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var passwordVisibilityToggleButton: ImageButton
     private lateinit var confirmPasswordVisibilityToggleButton: ImageButton
 
+    private lateinit var loadingLayout: LinearLayout
     private val viewModel: RegisterViewModel by viewModel()
 
 
@@ -54,9 +54,16 @@ class RegisterActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.state.collect { state ->
+
+                    val loading = state is RegisterUIState.IsLoading
+                    loadingLayout.isVisible = loading
+                    registerButton.isEnabled = !loading
+                    loginButton.isEnabled = !loading
+
+
                     when (state) {
                         is RegisterUIState.IsLoading -> {
-                            // TODO: Show loader
+                            // Handled above
                         }
 
                         is RegisterUIState.RegistrationSuccess -> {
@@ -125,6 +132,7 @@ class RegisterActivity : AppCompatActivity() {
         passwordVisibilityToggleButton = findViewById(R.id.btnAuthPasswordVisibility)
         confirmPasswordVisibilityToggleButton =
             findViewById(R.id.btnAuthConfirmPasswordVisibility)
+        loadingLayout = findViewById(R.id.loadingAuthLayout)
 
         // Since we are reusing the layout for login and register, we need to unhide the confirm password field
         // Since the layout is not further manipulated or queried, local variable is sufficient here

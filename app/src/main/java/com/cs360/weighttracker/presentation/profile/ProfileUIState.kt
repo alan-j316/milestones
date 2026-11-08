@@ -1,8 +1,5 @@
 package com.cs360.weighttracker.presentation.profile
 
-import com.cs360.weighttracker.domain.models.User
-import com.cs360.weighttracker.presentation.login.LoginUIState
-
 sealed interface ProfileUIState {
     object IsLoading : ProfileUIState
 

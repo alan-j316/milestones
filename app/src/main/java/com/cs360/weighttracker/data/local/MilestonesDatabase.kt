@@ -1,8 +1,6 @@
 package com.cs360.weighttracker.data.local
 
-import android.content.Context
 import androidx.room.Database
-import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.cs360.weighttracker.data.local.dao.DailyWeightDao
 import com.cs360.weighttracker.data.local.dao.UserDao

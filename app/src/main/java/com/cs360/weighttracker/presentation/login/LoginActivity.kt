@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
@@ -14,6 +15,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -35,6 +37,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var registerButton: Button
     private lateinit var passwordVisibilityToggleButton: ImageButton
 
+    private lateinit var loadingLayout: LinearLayout
 
     private val viewModel: LoginViewModel by viewModel()
 
@@ -50,14 +53,20 @@ class LoginActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.state.collect { state ->
+                    val loading = state is LoginUIState.IsLoading
+                    loadingLayout.isVisible =loading
+                    loginButton.isEnabled = !loading
+                    registerButton.isEnabled = !loading
+
                     when (state) {
+
                         LoginUIState.GoalNotSet -> {
                             // Navigate to goal screen
                             navigateToGoals()
                         }
 
                         LoginUIState.IsLoading -> {
-                            // TODO: Show loader
+                            // Handled above
                         }
 
                         LoginUIState.LogInSuccess -> {
@@ -105,6 +114,7 @@ class LoginActivity : AppCompatActivity() {
         usernameErrorTextView = findViewById(R.id.tvAuthUsernameError)
         passwordErrorTextView = findViewById(R.id.tvAuthPasswordError)
         passwordVisibilityToggleButton = findViewById(R.id.btnAuthPasswordVisibility)
+        loadingLayout = findViewById(R.id.loadingAuthLayout)
 
         // Setup UI Text
         // Since we are using the auth layout for both login and register

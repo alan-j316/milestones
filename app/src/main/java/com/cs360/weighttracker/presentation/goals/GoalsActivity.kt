@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
@@ -13,6 +14,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -33,6 +35,7 @@ class GoalsActivity : AppCompatActivity() {
     private lateinit var goalWeightErrorTextView: TextView
     private lateinit var headingTextView: TextView
 
+    private lateinit var loadingLayout: LinearLayout
 
     private val viewModel: GoalsViewModel by viewModel()
     var isEditMode: Boolean = false
@@ -50,6 +53,10 @@ class GoalsActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.state.collect { state ->
+                        val loading = state is GoalsUIState.IsLoading
+                        loadingLayout.isVisible = loading
+                        getStartedButton.isEnabled = !loading
+
                         when (state) {
                             GoalsUIState.CurrentWeightError -> {
                                 currentWeightErrorTextView.text =
@@ -70,7 +77,7 @@ class GoalsActivity : AppCompatActivity() {
                             }
 
                             GoalsUIState.IsLoading -> {
-                                // TODO: Add loading state
+                                // Handled above
                             }
 
                             GoalsUIState.SaveSuccess -> {
@@ -129,6 +136,7 @@ class GoalsActivity : AppCompatActivity() {
         headingTextView = findViewById(R.id.tvGoalsHeading)
 
         getStartedButton = findViewById(R.id.btnGoalsGetStarted)
+        loadingLayout = findViewById(R.id.loadingGoalsLayout)
 
         // Update action name according to starting activity
         // as recognizable from intent's passed-in boolean flag.
