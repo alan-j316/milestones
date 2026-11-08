@@ -28,6 +28,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.cs360.weighttracker.R
 import com.cs360.weighttracker.domain.models.GoalType
+import com.cs360.weighttracker.presentation.Constants
 import com.cs360.weighttracker.presentation.goals.GoalsActivity
 import com.cs360.weighttracker.presentation.login.LoginActivity
 import com.cs360.weighttracker.presentation.validators.PhoneNumberValidator
@@ -73,6 +74,7 @@ class ProfileActivity : AppCompatActivity() {
                 }
             }
         }
+
 
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -169,7 +171,7 @@ class ProfileActivity : AppCompatActivity() {
                         // Update user information
                         val fullNameTextView: TextView = findViewById(R.id.tvProfileFullName)
                         // If the user has no full name, then use their username(This is highly unlikely).
-                        val fullName = if (user.fullName.isEmpty()) user.fullName else user.userName
+                        val fullName = user.fullName.ifEmpty { user.userName }
                         fullNameTextView.text = fullName
 
                         // If the user has a phone number set, the update the number the textview with their number
@@ -398,7 +400,7 @@ class ProfileActivity : AppCompatActivity() {
     private fun navigateToGoals() {
         val intent = Intent(this, GoalsActivity::class.java)
         intent.putExtra(
-            com.cs360.weighttracker.presentation.Constants.GOAL_ACTIVITY_EDIT_FLAG, true
+            Constants.GOAL_ACTIVITY_EDIT_FLAG, true
         )
         startActivity(intent)
     }

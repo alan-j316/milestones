@@ -4,21 +4,26 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cs360.weighttracker.domain.IMilestoneRepository
 import com.cs360.weighttracker.presentation.validators.WeightValidator.validate
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class GoalsViewModel(private val repository: IMilestoneRepository) : ViewModel() {
 
-    private var _state = MutableStateFlow<GoalsUIState>(GoalsUIState.IsLoading)
-    val state = _state.asStateFlow()
+    private var _state = Channel<GoalsUIState>()
+    val state = _state.receiveAsFlow()
+
+    val currentUser = repository.getCurrentUser()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     fun onAction(action: GoalsActions) {
         when (action) {
             is GoalsActions.Save -> {
                 viewModelScope.launch {
-                    _state.update { GoalsUIState.IsLoading }
+                    _state.send(GoalsUIState.IsLoading)
                     val (fullName, currentWeight, goalWeight) = action
                     if (!validateInputs(fullName, currentWeight, goalWeight))
                         return@launch
@@ -29,9 +34,9 @@ class GoalsViewModel(private val repository: IMilestoneRepository) : ViewModel()
                     )
                     if (!result) {
                         // Operation failed
-                        _state.update { GoalsUIState.SaveError }
+                        _state.send(GoalsUIState.SaveError)
                     } else {
-                        _state.update { GoalsUIState.SaveSuccess }
+                        _state.send(GoalsUIState.SaveSuccess)
                     }
                 }
             }
@@ -47,21 +52,21 @@ class GoalsViewModel(private val repository: IMilestoneRepository) : ViewModel()
      * @param goalWeight The user's goal weight.
      * @return Boolean whether all the fields are valid.
      */
-    private fun validateInputs(
+    private suspend fun validateInputs(
         fullName: String,
         curWeight: Float,
         goalWeight: Float
     ): Boolean {
         if (fullName.isEmpty()) {
-            _state.update { GoalsUIState.FullNameError }
+            _state.send(GoalsUIState.FullNameError)
             return false
         }
         if (!validate(curWeight)) {
-            _state.update { GoalsUIState.CurrentWeightError }
+            _state.send(GoalsUIState.CurrentWeightError)
             return false
         }
         if (!validate(goalWeight)) {
-            _state.update { GoalsUIState.GoalWeighError }
+            _state.send(GoalsUIState.GoalWeighError)
             return false
         }
         return true

@@ -4,17 +4,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cs360.weighttracker.domain.IMilestoneRepository
 import com.cs360.weighttracker.presentation.shared.UserData
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ProfileViewModel(private val repository: IMilestoneRepository) : ViewModel() {
-    private var _state = MutableStateFlow<ProfileUIState>(ProfileUIState.IsLoading)
-    val state = _state.asStateFlow()
+    private var _state = Channel<ProfileUIState>()
+    val state = _state.receiveAsFlow()
 
     val userData =
         combine(repository.getLatestLoggedWeight(), repository.getCurrentUser()) { weight, user ->
@@ -28,29 +27,29 @@ class ProfileViewModel(private val repository: IMilestoneRepository) : ViewModel
     fun onAction(action: ProfileActions) {
         when (action) {
             ProfileActions.Logout -> {
-                _state.update { ProfileUIState.IsLoading }
                 viewModelScope.launch {
+                    _state.send(ProfileUIState.IsLoading)
                     repository.logoutUser()
-                    _state.update { ProfileUIState.LogoutSuccess }
+                    _state.send(ProfileUIState.LogoutSuccess)
                 }
             }
 
             is ProfileActions.UpdatePhone -> {
-                _state.update { ProfileUIState.IsLoading }
                 viewModelScope.launch {
+                    _state.send(ProfileUIState.IsLoading)
                     if (repository.setPhoneNumber(action.phoneNumber)) {
-                        _state.update { ProfileUIState.UpdateNumberSuccess }
+                        _state.send(ProfileUIState.UpdateNumberSuccess)
                     } else {
-                        _state.update { ProfileUIState.UpdateNumberError }
+                        _state.send(ProfileUIState.UpdateNumberError)
                     }
                 }
             }
 
             is ProfileActions.UpdateSMSSetting -> {
-                _state.update { ProfileUIState.IsLoading }
                 viewModelScope.launch {
+                    _state.send(ProfileUIState.IsLoading)
                     repository.setSMSSetting(action.setting)
-                    _state.update { ProfileUIState.UpdateSMSSettingSuccess }
+                    _state.send(ProfileUIState.UpdateSMSSettingSuccess)
                 }
             }
         }

@@ -22,9 +22,6 @@ import com.cs360.weighttracker.presentation.Constants
 import com.cs360.weighttracker.presentation.home.HomeActivity
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import kotlin.Boolean
-import kotlin.Exception
-import kotlin.getValue
 
 class GoalsActivity : AppCompatActivity() {
     private lateinit var fullNameEditText: EditText
@@ -78,8 +75,7 @@ class GoalsActivity : AppCompatActivity() {
 
                             GoalsUIState.SaveSuccess -> {
                                 // Navigate back
-                                if (isEditMode)
-                                    finish()
+                                if (isEditMode) finish()
                                 else navigateToHome()
 
                             }
@@ -99,12 +95,19 @@ class GoalsActivity : AppCompatActivity() {
 
                             GoalsUIState.SaveError -> {
                                 Toast.makeText(
-                                    this@GoalsActivity,
-                                    R.string.goal_save_error,
-                                    Toast.LENGTH_LONG
+                                    this@GoalsActivity, R.string.goal_save_error, Toast.LENGTH_LONG
                                 ).show()
                             }
                         }
+                    }
+                }
+
+                launch {
+                    viewModel.currentUser.collect { user ->
+                        if (user == null) return@collect
+                        fullNameEditText.setText(user.fullName)
+                        if (user.currentWeight > 0.0) currentWeightEditText.setText(user.currentWeight.toString())
+                        if (user.goalWeight > 0.0) goalWeightEditText.setText(user.goalWeight.toString())
                     }
                 }
             }
@@ -149,15 +152,12 @@ class GoalsActivity : AppCompatActivity() {
             val imeInsets = windowInsets.getInsets(WindowInsetsCompat.Type.ime())
 
             // If keyboard is open, push the scroll view bounds up by the keyboard height
-            val bottomPadding =
-                if (imeInsets.bottom > 0) imeInsets.bottom else systemBars.bottom
+            val bottomPadding = if (imeInsets.bottom > 0) imeInsets.bottom else systemBars.bottom
 
             // Apply to the scrollview container
             view!!.setPadding(
-                systemBars.left,
-                systemBars.top,  // Protects your status bar / top toolbar
-                systemBars.right,
-                bottomPadding // Dynamically adjusts when keyboard shows up
+                systemBars.left, systemBars.top,  // Protects your status bar / top toolbar
+                systemBars.right, bottomPadding // Dynamically adjusts when keyboard shows up
             )
 
             // The padding is getting applied, but we need to find the focus element
