@@ -12,7 +12,6 @@ import android.widget.CompoundButton
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ProgressBar
-import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
 import android.widget.Toast.makeText
@@ -139,9 +138,8 @@ class ProfileActivity : AppCompatActivity() {
                     viewModel.userData.collect { (user, weight) ->
                         if (user == null) return@collect
 
-                        val currentGoal = user.goalWeight
                         // If the user has not logged weight use the initial weight as the current weight
-                        val currentWeight: Float = weight?.weight ?: currentGoal
+                        val currentWeight: Float = weight?.weight ?: user.currentWeight
 
                         weightChangeProgressBar.progress = getProgress(user, currentWeight)
 
