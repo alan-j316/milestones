@@ -231,11 +231,9 @@ class MilestoneRepository(
             // NOTE: Upsert logic is handled by the database so there is no need to check it here
             // Get the user logged-in user's id
             val currentUserId = sharedPref.currentUserId
-            Log.e("Update User Info", "UserID: $currentUserId")
             if (currentUserId < 0)  // There is no current user
                 return false
             val user = database.userDao.getUser(currentUserId)
-            Log.e("Update User Info", "User: $user")
             checkNotNull(user) { "User not logged in!" }
 
             return database.userDao.upsert(

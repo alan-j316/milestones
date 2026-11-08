@@ -180,14 +180,6 @@ class ProfileActivity : AppCompatActivity() {
     }
 
 
-    // TODO: REMOVE
-//    override fun onStart() {
-//        super.onStart()
-//        
-//        prefillUI()
-//        updateProgress()
-//    }
-
     /**
      * Query and attach each view instance from XML layout.
      */
@@ -223,52 +215,6 @@ class ProfileActivity : AppCompatActivity() {
         // Update the notification setting
         notificationSwitch.isChecked = viewModel.smsPreference
     }
-
-
-//    private fun updateProgress() {
-//        val currentGoal = viewModel.currentUser.goalWeight
-//        val latestWeight: DailyWeight? = repository.getUserLatestLoggedWeight()
-//
-//        // If the user has not logged weight use the initial weight as the current weight
-//        val currentWeight: kotlin.Float =
-//            if (latestWeight == null) currentGoal.getCurrentWeight() else latestWeight.userWeight
-//
-//        if (currentGoal.getGoalType() === GoalType.WEIGHT_LOSS) {
-//            // Get current weight returns the user's initial weight
-//            // and we compare it the user's logged weight to get the progress
-//            val weightLost: kotlin.Float = currentGoal.getCurrentWeight() - currentWeight
-//            val goalTotal: kotlin.Float =
-//                currentGoal.getCurrentWeight() - currentGoal.getGoalWeight()
-//            weightProgressTextView.setText(
-//                this.getString(
-//                    R.string.weight_loss_progress,
-//                    weightLost,
-//                    goalTotal
-//                )
-//            )
-//            val progressPercentage = (weightLost / goalTotal * 100).toInt()
-//            val progress = kotlin.math.max(0, kotlin.math.min(100, progressPercentage))
-//            weightChangeProgressBar.setProgress(progress)
-//        } else {
-//            // For weight gain the current weight will be greater than the initial weight
-//            // else the progress will show negative values.
-//            val weightGained: kotlin.Float = currentWeight - currentGoal.getCurrentWeight()
-//            val goalTotal: kotlin.Float =
-//                currentGoal.getGoalWeight() - currentGoal.getCurrentWeight()
-//            weightProgressTextView.setText(
-//                this.getString(
-//                    R.string.weight_gain_progress,
-//                    weightGained,
-//                    goalTotal
-//                )
-//            )
-//
-//            val progressPercentage = (weightGained / goalTotal * 100).toInt()
-//            val progress = kotlin.math.max(0, kotlin.math.min(100, progressPercentage))
-//            weightChangeProgressBar.setProgress(progress)
-//        }
-//    }
-
 
     /**
      * Sets up the event listeners necessary for all the views.

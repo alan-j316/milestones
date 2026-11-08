@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.telephony.SmsManager
+import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.ProgressBar
@@ -61,129 +62,157 @@ class HomeActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.state.collect { state ->
-                    when (state) {
-                        HomeUIState.IsLoading -> {
-                            // TODO: Add loading spinner
-                        }
-
-                        is HomeUIState.WeightTracked -> {
-                            Toast.makeText(
-                                this@HomeActivity, R.string.weight_added_successfully,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-
-                        is HomeUIState.WeightDeleted -> {
-                            Toast.makeText(
-                                this@HomeActivity,
-                                R.string.msg_weight_deleted, Toast.LENGTH_SHORT
-                            )
-                                .show()
-                        }
-
-                        // NOTE: This event is only triggered if user has their notification
-                        //       setting `ON`.
-                        is HomeUIState.GoalWeightReached -> {
-                            // If user doesn't have their SEND sms setting on
-                            // Show a Toast and return
-                            if (!state.sendSms) {
-                                Toast.makeText(
-                                    this@HomeActivity, R.string.congratulations, Toast.LENGTH_SHORT
-                                ).show()
-                                return@collect
+                launch {
+                    viewModel.state.collect { state ->
+                        when (state) {
+                            HomeUIState.IsLoading -> {
+                                // TODO: Add loading spinner
                             }
 
+                            is HomeUIState.WeightTracked -> {
+                                Toast.makeText(
+                                    this@HomeActivity, R.string.weight_added_successfully,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
 
-                            val user = viewModel.currentUser
-                            // Check if the user has granted permission
-                            // NOTE: We are not handling the permission here since if the user has their preference as off
-                            // or has manually turned off the permission, we can assume that they don't need the feature,
-                            // but we can show them an error message
-                            val hasPermission = ContextCompat.checkSelfPermission(
-                                this@HomeActivity, Manifest.permission.SEND_SMS
-                            ) == PackageManager.PERMISSION_GRANTED
-                            if (hasPermission && !user.phoneNumber.trim { it <= ' ' }.isEmpty()) {
-                                try {
-                                    val smsManager =
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                                            getSystemService(SmsManager::class.java)
-                                        } else {
-                                            // Fallback for older Android versions like Android 7
-                                            SmsManager.getDefault()
-                                        }
-                                    // We are using the latest weight as it can surpass the user's current weight!
-                                    val message = getString(
-                                        R.string.congratulations_sms,
-                                        user.fullName,
-                                        user.goalWeight,
-                                        state.weight
-                                    )
-                                    if (smsManager != null) {
-                                        smsManager.sendTextMessage(
-                                            user.phoneNumber, null, message, null, null
+                            is HomeUIState.WeightDeleted -> {
+                                Toast.makeText(
+                                    this@HomeActivity,
+                                    R.string.msg_weight_deleted, Toast.LENGTH_SHORT
+                                )
+                                    .show()
+                            }
+
+                            // NOTE: This event is only triggered if user has their notification
+                            //       setting `ON`.
+                            is HomeUIState.GoalWeightReached -> {
+                                // If user doesn't have their SEND sms setting on
+                                // Show a Toast and return
+                                if (!state.sendSms) {
+                                    Toast.makeText(
+                                        this@HomeActivity,
+                                        R.string.congratulations,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    return@collect
+                                }
+
+
+                                val user = viewModel.currentUser ?: return@collect
+                                // Check if the user has granted permission
+                                // NOTE: We are not handling the permission here since if the user has their preference as off
+                                // or has manually turned off the permission, we can assume that they don't need the feature,
+                                // but we can show them an error message
+                                val hasPermission = ContextCompat.checkSelfPermission(
+                                    this@HomeActivity, Manifest.permission.SEND_SMS
+                                ) == PackageManager.PERMISSION_GRANTED
+                                if (hasPermission && !user.phoneNumber.trim { it <= ' ' }
+                                        .isEmpty()) {
+                                    try {
+                                        val smsManager =
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                                getSystemService(SmsManager::class.java)
+                                            } else {
+                                                // Fallback for older Android versions like Android 7
+                                                SmsManager.getDefault()
+                                            }
+                                        // We are using the latest weight as it can surpass the user's current weight!
+                                        val message = getString(
+                                            R.string.congratulations_sms,
+                                            user.fullName,
+                                            user.goalWeight,
+                                            state.weight
                                         )
+                                        if (smsManager != null) {
+                                            smsManager.sendTextMessage(
+                                                user.phoneNumber, null, message, null, null
+                                            )
+                                            Toast.makeText(
+                                                this@HomeActivity,
+                                                R.string.sms_sent_successfully,
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                    } catch (_: Exception) {
                                         Toast.makeText(
                                             this@HomeActivity,
-                                            R.string.sms_sent_successfully,
+                                            R.string.failed_to_send_sms,
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     }
-                                } catch (_: Exception) {
-                                    Toast.makeText(
-                                        this@HomeActivity,
-                                        R.string.failed_to_send_sms,
-                                        Toast.LENGTH_SHORT
-                                    ).show()
                                 }
                             }
-                        }
 
-                        is HomeUIState.InitialDataLoaded -> {
-                            val user = state.user
-                            fullNameTextView.text = user.fullName
-                            greetingTextView.setText(TimeUtils.greetingResId)
-                            startWeightTextView.text = getString(
-                                R.string.weight_format, user.currentWeight
-                            )
-                            goalWeightTextView.text = getString(
-                                R.string.weight_format, user.goalWeight
-                            )
-                        }
+                            is HomeUIState.InitialDataLoaded -> {
+                                val user = state.user
+                                fullNameTextView.text = user.fullName
+                                greetingTextView.setText(TimeUtils.greetingResId)
+                                startWeightTextView.text = getString(
+                                    R.string.weight_format, user.currentWeight
+                                )
+                                goalWeightTextView.text = getString(
+                                    R.string.weight_format, user.goalWeight
+                                )
 
-                        HomeUIState.WeightDeleteError -> TODO()
-                        HomeUIState.WeightTrackingError -> TODO()
+                                // Set up the progress in case the user loaded late
+                                val weight = viewModel.latestWeight.value
+                                val currentWeight = weight?.weight ?: user.currentWeight
+                                currentWeightTextView.text = getString(
+                                    R.string.weight_format, currentWeight
+                                )
+                                val progress = getProgress(weight?.weight)
+                                weightProgressBar.progress = progress
+                            }
+
+                            HomeUIState.WeightDeleteError -> {
+                                Toast.makeText(
+                                    this@HomeActivity,
+                                    R.string.delete_weight_error, Toast.LENGTH_SHORT
+                                ).show()
+                            }
+
+                            HomeUIState.WeightTrackingError -> {
+                                Toast.makeText(
+                                    this@HomeActivity,
+                                    R.string.track_weight_error, Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
                     }
                 }
-            }
 
-            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.latestWeight.collect { weight ->
-                    // If the user has no goal weight set, then set the UserGoal's start weight as the current weight
-                    val currentWeight = weight?.weight ?: viewModel.currentUser.currentWeight
-                    currentWeightTextView.text = getString(
-                        R.string.weight_format, currentWeight
-                    )
-                    // Update the progress
-                    val progress = getProgress(weight?.weight)
-                    weightProgressBar.progress = progress
-                }
-            }
-
-            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.dailyWeights.collect { weights ->
-                    // Show the history view if there is data
-                    // else show the placeholder rather than a blank screen
-                    if (weights.isEmpty()) {
-                        progressHistoryRecyclerView.visibility = View.GONE
-                        noWeightsLayout.visibility = View.VISIBLE
-                    } else {
-                        noWeightsLayout.visibility = View.GONE
-                        progressHistoryRecyclerView.visibility = View.VISIBLE
-                        adapter.submitList(weights)
+                launch {
+                    viewModel.latestWeight.collect { weight ->
+                        val user = viewModel.currentUser ?: return@collect
+                        // If the user has no goal weight set, then set the UserGoal's start weight as the current weight
+                        val currentWeight = weight?.weight ?: user.currentWeight
+                        currentWeightTextView.text = getString(
+                            R.string.weight_format, currentWeight
+                        )
+                        // Update the progress
+                        val progress = getProgress(weight?.weight)
+                        weightProgressBar.progress = progress
                     }
                 }
+
+                launch {
+                    viewModel.dailyWeights.collect { weights ->
+                        // Show the history view if there is data
+                        // else show the placeholder rather than a blank screen
+                        if (weights.isEmpty()) {
+                            progressHistoryRecyclerView.visibility = View.GONE
+                            noWeightsLayout.visibility = View.VISIBLE
+                        } else {
+                            noWeightsLayout.visibility = View.GONE
+                            progressHistoryRecyclerView.visibility = View.VISIBLE
+                            adapter.submitList(weights)
+                        }
+                    }
+                }
+
             }
+
         }
     }
 
@@ -208,15 +237,6 @@ class HomeActivity : AppCompatActivity() {
             // show a dialog with a confirmation. On confirmation, delete the weight.
             val dialog = DeleteWeightItemDialog {
                 viewModel.onAction(HomeActions.DeleteWeight(itemId))
-                // TODO: REMOVE
-//                val weightDeleted: Boolean = repository.deleteDailyWeight(itemId)
-//                if (weightDeleted) {
-//                    refreshHistory()
-//                    latestWeight = repository.getUserLatestLoggedWeight()
-//                    prefillUI()
-//                    Toast.makeText(this, "Weight deleted successfully.", Toast.LENGTH_SHORT)
-//                        .show()
-//                }
             }
             dialog.show(
                 supportFragmentManager, Constants.DELETE_WEIGHT_ITEM_DIALOG
@@ -235,7 +255,7 @@ class HomeActivity : AppCompatActivity() {
      */
     private fun getProgress(weight: Float?): Int {
         weight?.let {
-            val user = viewModel.currentUser;
+            val user = viewModel.currentUser ?: return@let 0;
 
             var progress: Int
             if (user.getGoalType() == GoalType.WEIGHT_LOSS) {
@@ -262,52 +282,6 @@ class HomeActivity : AppCompatActivity() {
     }
 
 
-// TODO: Remove
-//    private fun setupRecyclerView() {
-//        // Setup the recycler view with an empty list on startup
-//        adapter = WeightItemAdapter(
-//            emptyList(),
-//            WeightItemRemoveListener { itemId: Long ->
-//                // For deleting the weight, to provide the user with a chance to rethink their
-//                // show a dialog with a confirmation. On confirmation, delete the weight.
-//                val dialog: DeleteWeightItemDialog = DeleteWeightItemDialog(DialogClickListener {
-//                    val weightDeleted: Boolean = repository.deleteDailyWeight(itemId)
-//                    if (weightDeleted) {
-//                        refreshHistory()
-//                        latestWeight = repository.getUserLatestLoggedWeight()
-//                        prefillUI()
-//                        Toast.makeText(this, "Weight deleted successfully.", Toast.LENGTH_SHORT)
-//                            .show()
-//                    }
-//                })
-//                dialog.show(
-//                    supportFragmentManager, Constants.DELETE_WEIGHT_ITEM_DIALOG
-//                )
-//            })
-//        progressHistoryRecyclerView.setAdapter(adapter)
-//        // TODO: REMOVE
-////        refreshHistory() // Must refresh on initial load
-//    }
-
-// TODO: REMOVE
-//    /**
-//     * Refresh the weight progress data with new data from the repository.
-//     */
-//    private fun refreshHistory() {
-//        val newData: MutableList<DailyWeight?> = repository.getDailyWeights()
-//        // Show the history view if there is data
-//        // else show the placeholder rather than a blank screen
-//        if (newData.isEmpty()) {
-//            progressHistoryRecyclerView.visibility = android.view.View.GONE
-//            noWeightsLayout.visibility = android.view.View.VISIBLE
-//        } else {
-//            noWeightsLayout.visibility = android.view.View.GONE
-//            progressHistoryRecyclerView.visibility = android.view.View.VISIBLE
-//            adapter.updateData(newData)
-//        }
-//    }
-
-
     /**
      * Sets up the event listeners necessary for all the views.
      */
@@ -320,95 +294,12 @@ class HomeActivity : AppCompatActivity() {
                 supportFragmentManager, Constants.ADD_NEW_WEIGHT_DIALOG
             )
         }
-// TODO: REMOVE
-//        // Add event listener for the dialog
-//        supportFragmentManager.setFragmentResultListener(
-//            Constants.ADD_NEW_WEIGHT_DIALOG,
-//            this,
-//            (FragmentResultListener { _: String, result: Bundle ->
-//                val weight: Float =
-//                    result.getFloat(Constants.NEW_WEIGHT_BUNDLE_KEY)
-//                if (repository.logDailyWeight(weight)) {
-//                    refreshHistory()
-//                    latestWeight = repository.getUserLatestLoggedWeight()
-//                    prefillUI()
-//                    // Send a sms if the user surpassed or reached the goal weight and have the permission and phone number set
-//                    if (hasReachGoalWeight(weight)) {
-//                        val shouldSendNotification: Boolean =
-//                            repository.getUserNotificationSetting()
-//                        if (shouldSendNotification) {
-//                            // Check if the user has granted permission
-//                            // Note: We are not handling the permission here since if hte user has their preference as off
-//                            // or has manually turned off the permission, we can assume that they don't need the feature
-//                            // but we can show them an error message
-//                            val hasPermission = ContextCompat.checkSelfPermission(
-//                                this,
-//                                Manifest.permission.SEND_SMS
-//                            ) == PackageManager.PERMISSION_GRANTED
-//                            val phoneNumber = currentUser!!.phoneNumber
-//                            if (hasPermission && !phoneNumber.trim { it <= ' ' }.isEmpty()) {
-//                                try {
-//                                    val userGoal: GoalWeight = repository.getUserGoalWeight()
-//                                    val smsManager =
-//                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-//                                            this.getSystemService(SmsManager::class.java)
-//                                        } else {
-//                                            // Fallback for older Android versions like Android 7
-//                                            SmsManager.getDefault()
-//                                        }
-//                                    // We are using hte latest weight as it can surpass the user's current weight!
-//                                    val message = getString(
-//                                        R.string.congratulations_sms,
-//                                        currentUser!!.fullName,
-//                                        userGoal.getCurrentWeight(),
-//                                        weight
-//                                    )
-//                                    if (smsManager != null) {
-//                                        smsManager.sendTextMessage(
-//                                            phoneNumber,
-//                                            null,
-//                                            message,
-//                                            null,
-//                                            null
-//                                        ) //
-//                                        Toast.makeText(
-//                                            this,
-//                                            R.string.sms_sent_successfully,
-//                                            Toast.LENGTH_SHORT
-//                                        ).show() //
-//                                    }
-//                                } catch (e: Exception) {
-//                                    Toast.makeText(
-//                                        this,
-//                                        R.string.failed_to_send_sms,
-//                                        Toast.LENGTH_SHORT
-//                                    ).show()
-//                                }
-//                            }
-//                        }
-//
-//                        Toast.makeText(
-//                            this,
-//                            this.getString(R.string.congratulations),
-//                            Toast.LENGTH_SHORT
-//                        ).show()
-//                    } else {
-//                        Toast.makeText(
-//                            this,
-//                            this.getString(R.string.weight_added_successfully),
-//                            Toast.LENGTH_SHORT
-//                        ).show()
-//                    }
-//                }
-//            })
-//        )
-
         profileImage.setOnClickListener { _: View -> navigateToProfile() }
     }
 
 
     private fun navigateToProfile() {
-        val intent: Intent = Intent(this, ProfileActivity::class.java)
+        val intent = Intent(this, ProfileActivity::class.java)
         startActivity(intent)
     }
 }

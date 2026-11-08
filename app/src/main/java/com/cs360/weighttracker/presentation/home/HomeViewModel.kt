@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -18,20 +19,20 @@ class HomeViewModel(private val repository: IMilestoneRepository) : ViewModel() 
     val state = _state.asStateFlow()
 
     // Latest Weight
-    val latestWeight = repository.getLatestLoggedWeight().shareIn(
+    val latestWeight = repository.getLatestLoggedWeight().stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        replay = 1
+        initialValue = null
     )
 
     // Daily Weights Flow State
-    val dailyWeights = repository.dailyWeights.shareIn(
+    val dailyWeights = repository.dailyWeights.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        replay = 1
+        initialValue = emptyList()
     )
 
-    lateinit var currentUser: User
+    var currentUser: User? = null
         private set
 
     init {
@@ -39,7 +40,10 @@ class HomeViewModel(private val repository: IMilestoneRepository) : ViewModel() 
             // At this point current user must not be null
             // and if it is null, user has either logged out in which case
             // it is an invalid state or there was some hardware error or exception
-            currentUser = repository.getCurrentUser()!!
+            val user = repository.getCurrentUser()!!
+            currentUser = user
+
+            _state.update { HomeUIState.InitialDataLoaded(user) }
         }
     }
 
@@ -51,13 +55,14 @@ class HomeViewModel(private val repository: IMilestoneRepository) : ViewModel() 
                 _state.update { HomeUIState.IsLoading }
                 viewModelScope.launch {
                     val deleteSuccess = repository.deleteDailyWeight(action.id)
-                    if(deleteSuccess) {
+                    if (deleteSuccess) {
                         _state.update { HomeUIState.WeightDeleted }
                     } else {
                         _state.update { HomeUIState.WeightDeleteError }
                     }
                 }
             }
+
             is HomeActions.TrackWeight -> {
                 _state.update { HomeUIState.IsLoading }
                 viewModelScope.launch {
@@ -93,14 +98,17 @@ class HomeViewModel(private val repository: IMilestoneRepository) : ViewModel() 
      * @return False otherwise.
      */
     private fun hasReachGoalWeight(newWeight: Float): Boolean {
-        val weightGoal: Float = currentUser.goalWeight
-        // In case of weight gain we need to check if current logged weight is greater or equal to
-        // the goal weight and weight loss if the logged weight is less than or equal
-        return if (currentUser.getGoalType() === GoalType.WEIGHT_GAIN) {
-            newWeight >= weightGoal
-        } else {
-            newWeight <= weightGoal
+        currentUser?.let { user ->
+            val weightGoal: Float = user.goalWeight
+            // In case of weight gain we need to check if current logged weight is greater or equal to
+            // the goal weight and weight loss if the logged weight is less than or equal
+            return if (user.getGoalType() === GoalType.WEIGHT_GAIN) {
+                newWeight >= weightGoal
+            } else {
+                newWeight <= weightGoal
+            }
         }
+        return false // Return false if user is null(loading phase)
     }
 
 }

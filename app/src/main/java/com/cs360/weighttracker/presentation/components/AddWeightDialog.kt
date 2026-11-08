@@ -3,6 +3,7 @@ package com.cs360.weighttracker.presentation.components
 import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -14,6 +15,7 @@ import com.cs360.weighttracker.R
 import com.cs360.weighttracker.presentation.home.HomeActions
 import com.cs360.weighttracker.presentation.home.HomeViewModel
 import com.cs360.weighttracker.presentation.validators.WeightValidator.validate
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 class AddWeightDialog : DialogFragment() {
     private lateinit var weightEditText: EditText
@@ -21,7 +23,7 @@ class AddWeightDialog : DialogFragment() {
     private lateinit var logWeightButton: Button
     private lateinit var weightErrorTextView: TextView
 
-    val viewModel by viewModels<HomeViewModel>()
+    val viewModel by activityViewModel<HomeViewModel>()
 
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -55,26 +57,18 @@ class AddWeightDialog : DialogFragment() {
     private fun setupEvents() {
         logWeightButton.setOnClickListener { _: View? ->
             val weightStr = weightEditText.text.toString()
-            try {
-                val weight = weightStr.toFloat()
-                if (!validate(weight)) throw Exception("Illegal weight value")
+            val weight = weightStr.toFloatOrNull()
+//            Log.e("Weight", "Str: $weightStr Float: $weight")
+            if (weight == null || !validate(weight)) {
 
-                viewModel.onAction(HomeActions.TrackWeight(weight))
-                // TODO: REMOVE
-                // Save the result in a bundle so we can share it to the parent view (Home Activity)
-//                val result = Bundle()
-//                result.putFloat(Constants.NEW_WEIGHT_BUNDLE_KEY, weight)\
-//                getParentFragmentManager().setFragmentResult(
-//                    Constants.ADD_NEW_WEIGHT_DIALOG,
-//                    result
-//                )
-
-                // Dismiss the dialog
-                dismiss()
-            } catch (_: Exception) {
                 weightErrorTextView.text = requireContext().getString(R.string.weight_error)
                 weightErrorTextView.visibility = View.VISIBLE
+                return@setOnClickListener
             }
+
+            viewModel.onAction(HomeActions.TrackWeight(weight))
+            // Dismiss the dialog
+            dismiss()
         }
 
         // If cancel button is pressed, then close the dialog
