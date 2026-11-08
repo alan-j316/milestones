@@ -35,4 +35,5 @@
     <dimen name="space_0">0dp</dimen>
     <dimen name="progress_min_width">160dp</dimen>
     <dimen name="progress_max_width">400dp</dimen>
+    <dimen name="loader_width">320dp</dimen>
 </resources>

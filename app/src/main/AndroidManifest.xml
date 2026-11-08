@@ -2,14 +2,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!--  SENDING SMS is an optional feature  -->
     <uses-feature
         android:name="android.hardware.telephony"
-        android:required="true" />
+        android:required="false" />
 
-    <uses-permission android:name="android.permission.SEND_SMS"
+    <uses-permission
+        android:name="android.permission.SEND_SMS"
         tools:ignore="SmsAndCallLogPolicy" />
 
     <application
+        android:name=".MilestoneApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -19,7 +22,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WeightTracker">
         <activity
-            android:name=".LoginActivity"
+            android:name=".presentation.login.LoginActivity"
             android:exported="true"
             android:theme="@style/Theme.WeightTracker"
             android:windowSoftInputMode="adjustResize">
@@ -30,29 +33,25 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".RegisterActivity"
+            android:name=".presentation.register.RegisterActivity"
             android:exported="true"
             android:theme="@style/Theme.WeightTracker"
-            android:windowSoftInputMode="adjustResize">
-        </activity>
+            android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".HomeActivity"
+            android:name=".presentation.home.HomeActivity"
             android:exported="true"
             android:theme="@style/Theme.WeightTracker"
-            android:windowSoftInputMode="adjustResize">
-        </activity>
+            android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".ProfileActivity"
+            android:name=".presentation.profile.ProfileActivity"
             android:exported="true"
             android:theme="@style/Theme.WeightTracker"
-            android:windowSoftInputMode="adjustResize">
-        </activity>
+            android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".GoalsActivity"
+            android:name=".presentation.goals.GoalsActivity"
             android:exported="true"
             android:theme="@style/Theme.WeightTracker"
-            android:windowSoftInputMode="adjustResize">
-        </activity>
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

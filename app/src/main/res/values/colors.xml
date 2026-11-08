@@ -56,4 +56,5 @@
     <color name="red_800">#67011c</color>
     <color name="red_900">#40000e</color>
     <color name="red_950">#2c0007</color>
+    <color name="overlay">#80000000</color>
 </resources>

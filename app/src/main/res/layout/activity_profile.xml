@@ -184,7 +184,7 @@
 
             </LinearLayout>
 
-            <Switch
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/switchProfileNotificationSetting"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -206,6 +206,34 @@
             app:layout_constraintTop_toBottomOf="@+id/layoutNotificationSettings"
             app:layout_constraintWidth_max="@dimen/max_btn_width" />
 
+        <LinearLayout
+            android:id="@+id/loadingProfileLayout"
+            android:layout_width="@dimen/loader_width"
+            android:layout_height="wrap_content"
+            android:background="@color/primary_50"
+            android:clickable="true"
+            android:elevation="4dp"
+            android:focusable="true"
+            android:paddingVertical="@dimen/space_lg"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="@dimen/space_md" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="@dimen/space_xs"
+                android:text="@string/loading"
+                android:textSize="@dimen/fs_lg" />
+        </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
