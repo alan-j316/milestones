@@ -6,15 +6,17 @@ import com.cs360.weighttracker.domain.IMilestoneRepository
 import com.cs360.weighttracker.domain.status.LoginStatus
 import com.cs360.weighttracker.presentation.validators.PasswordValidator
 import com.cs360.weighttracker.presentation.validators.UsernameValidator
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class LoginViewModel(private val repository: IMilestoneRepository) : ViewModel() {
-    private val _state = MutableStateFlow<LoginUIState>(LoginUIState.IsLoading)
-    val state: StateFlow<LoginUIState> = _state.asStateFlow()
+    private val _state = Channel<LoginUIState>()
+    val state = _state.receiveAsFlow()
 
     init {
         // Query the repository to check if the user is already logged in and if they are
@@ -29,17 +31,15 @@ class LoginViewModel(private val repository: IMilestoneRepository) : ViewModel()
         when (action) {
             is LoginActions.Login -> {
                 viewModelScope.launch {
-                    _state.update {
-                        LoginUIState.IsLoading
-                    }
+                    _state.send(LoginUIState.IsLoading)
                     if (!validateLogin(action.username, action.password))
                         return@launch
                     val result = repository.loginUser(action.username, action.password)
                     when (result) {
-                        LoginStatus.USERNAME_ERROR -> _state.update { LoginUIState.UsernameError }
-                        LoginStatus.PASSWORD_ERROR -> _state.update { LoginUIState.PasswordError }
+                        LoginStatus.USERNAME_ERROR -> _state.send(LoginUIState.UsernameError)
+                        LoginStatus.PASSWORD_ERROR -> _state.send(LoginUIState.PasswordError)
                         LoginStatus.SUCCESS -> triggerLoginEvent()
-                        LoginStatus.UNKNOWN_FAILURE -> _state.update { LoginUIState.UnknownError }
+                        LoginStatus.UNKNOWN_FAILURE -> _state.send (LoginUIState.UnknownError )
                     }
                 }
             }
@@ -55,12 +55,12 @@ class LoginViewModel(private val repository: IMilestoneRepository) : ViewModel()
         val currentUser = repository.getCurrentUser()
         currentUser?.let { user ->
             if (repository.userHasGoalSet(user.userId)) {
-                _state.update { LoginUIState.LogInSuccess }
+                _state.send(LoginUIState.LogInSuccess)
                 return
             }
+            // If not trigger goal not set event
+            _state.send(LoginUIState.GoalNotSet)
         }
-        // If not trigger goal not set event
-        _state.update { LoginUIState.GoalNotSet }
     }
 
 
@@ -68,22 +68,21 @@ class LoginViewModel(private val repository: IMilestoneRepository) : ViewModel()
      * Validates the login and returns a boolean indicating whether
      * all the provided information is valid.
      */
-    private fun validateLogin(
+    private suspend fun validateLogin(
         username: String,
         password: String,
     ): Boolean {
-        var isValidLogin = true
         if (!UsernameValidator.validate(username)) {
-            _state.update { LoginUIState.UsernameError }
-            isValidLogin = false
+            _state.send(LoginUIState.UsernameError)
+            return false
         }
 
         if (!PasswordValidator.validate(password)) {
-            _state.update { LoginUIState.PasswordError }
-            isValidLogin = false
+            _state.send(LoginUIState.PasswordError)
+            return false
         }
 
-        return isValidLogin
+        return true
     }
 
 }

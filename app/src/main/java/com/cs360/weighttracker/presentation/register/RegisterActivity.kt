@@ -22,6 +22,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.cs360.weighttracker.R
 import com.cs360.weighttracker.presentation.goals.GoalsActivity
+import com.cs360.weighttracker.presentation.login.LoginUIState
 import com.cs360.weighttracker.presentation.utils.PasswordVisibilityToggler
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -100,8 +101,6 @@ class RegisterActivity : AppCompatActivity() {
                                 Toast.LENGTH_LONG
                             ).show()
                         }
-
-
                     }
                 }
             }
