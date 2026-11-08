@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.ksp) apply false
+    alias(libs.plugins.koin.compiler)
 }
 
 android {
@@ -57,8 +58,17 @@ dependencies {
     implementation libs.navigation.ui
     implementation libs.recyclerview
     implementation libs.room
+    // Koin DI
+    implementation platform(libs.koin.bom)
+    implementation libs.koin.core
+    implementation libs.koin.android
+
     annotationProcessor libs.room.compiler
+
+    // Unit Tests
     testImplementation libs.junit
+
+    // Android Tests
     androidTestImplementation libs.espresso.core
     androidTestImplementation libs.ext.junit
 }

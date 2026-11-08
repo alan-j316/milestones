@@ -10,7 +10,6 @@ import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -22,7 +21,7 @@ import com.cs360.weighttracker.R
 import com.cs360.weighttracker.presentation.Constants
 import com.cs360.weighttracker.presentation.home.HomeActivity
 import kotlinx.coroutines.launch
-import java.lang.String
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.Boolean
 import kotlin.Exception
 import kotlin.getValue
@@ -38,7 +37,7 @@ class GoalsActivity : AppCompatActivity() {
     private lateinit var headingTextView: TextView
 
 
-    private val viewModel: GoalsViewModel by viewModels()
+    private val viewModel: GoalsViewModel by viewModel()
     var isEditMode: Boolean = false
 
 
@@ -90,15 +89,19 @@ class GoalsActivity : AppCompatActivity() {
                                 fullNameEditText.setText(state.fullName)
                             }
                             if (state.goalWeight > 0.0) {
-                                goalWeightEditText.setText(String.valueOf(state.goalWeight))
+                                goalWeightEditText.setText(state.goalWeight.toString())
                             }
                             if (state.currentWeight > 0.0) {
-                                currentWeightEditText.setText(String.valueOf(state.currentWeight))
+                                currentWeightEditText.setText(state.currentWeight.toString())
                             }
                         }
 
                         else -> {
-                            Toast.makeText(this@GoalsActivity, R.string.goal_update_error, Toast.LENGTH_LONG).show()
+                            Toast.makeText(
+                                this@GoalsActivity,
+                                R.string.goal_update_error,
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
                     }
                 }

@@ -33,6 +33,7 @@ import com.cs360.weighttracker.presentation.goals.GoalsActivity
 import com.cs360.weighttracker.presentation.login.LoginActivity
 import com.cs360.weighttracker.presentation.validators.PhoneNumberValidator
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.math.max
 import kotlin.math.min
 
@@ -47,7 +48,7 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var updateNumberButton: Button
     private lateinit var navigateBackButton: ImageButton
 
-    private val viewModel by viewModels<ProfileViewModel>()
+    private val viewModel: ProfileViewModel by viewModel()
 
 
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>

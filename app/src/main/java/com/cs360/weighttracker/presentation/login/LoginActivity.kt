@@ -25,6 +25,7 @@ import com.cs360.weighttracker.presentation.home.HomeActivity
 import com.cs360.weighttracker.presentation.register.RegisterActivity
 import com.cs360.weighttracker.presentation.utils.PasswordVisibilityToggler
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var usernameErrorTextView: TextView
@@ -36,7 +37,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var passwordVisibilityToggleButton: ImageButton
 
 
-    private val viewModel: LoginViewModel by viewModels()
+    private val viewModel: LoginViewModel by viewModel()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {

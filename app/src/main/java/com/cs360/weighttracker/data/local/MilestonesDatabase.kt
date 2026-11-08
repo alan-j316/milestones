@@ -18,20 +18,4 @@ abstract class MilestonesDatabase : RoomDatabase() {
 
     abstract val userDao: UserDao
     abstract val dailyWeightDao: DailyWeightDao
-
-    companion object {
-        @Volatile
-        private var INSTANCE: MilestonesDatabase? = null;
-
-        /// Get the current Room Database instance.
-        fun getInstance(ctx: Context): RoomDatabase {
-            return INSTANCE ?: synchronized(this) {
-                Room.databaseBuilder(
-                    ctx,
-                    klass = MilestonesDatabase::class.java,
-                    name = "milestones.db",
-                ).build().also { INSTANCE = it; }
-            }
-        }
-    }
 }

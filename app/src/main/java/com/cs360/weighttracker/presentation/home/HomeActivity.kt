@@ -28,6 +28,7 @@ import com.cs360.weighttracker.presentation.components.DeleteWeightItemDialog
 import com.cs360.weighttracker.presentation.components.WeightItemAdapter
 import com.cs360.weighttracker.presentation.utils.TimeUtils
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.lang.Exception
 import kotlin.jvm.java
 import kotlin.math.max
@@ -47,7 +48,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var adapter: WeightItemAdapter
     private lateinit var noWeightsLayout: LinearLayout
 
-    private val viewModel: HomeViewModel by viewModels()
+    private val viewModel: HomeViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

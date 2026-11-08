@@ -24,6 +24,7 @@ import com.cs360.weighttracker.R
 import com.cs360.weighttracker.presentation.goals.GoalsActivity
 import com.cs360.weighttracker.presentation.utils.PasswordVisibilityToggler
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class RegisterActivity : AppCompatActivity() {
     private lateinit var pageTitleTextView: TextView
@@ -38,7 +39,7 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var passwordVisibilityToggleButton: ImageButton
     private lateinit var confirmPasswordVisibilityToggleButton: ImageButton
 
-    private val viewModel: RegisterViewModel by viewModels()
+    private val viewModel: RegisterViewModel by viewModel()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,28 +57,33 @@ class RegisterActivity : AppCompatActivity() {
                         is RegisterUIState.IsLoading -> {
                             // TODO: Show loader
                         }
+
                         is RegisterUIState.RegistrationSuccess -> {
                             // Navigate to goal activity
                             navigateToGoal()
                         }
+
                         is RegisterUIState.UsernameError -> {
                             // Show username error
                             usernameErrorTextView.text =
                                 applicationContext.getString(R.string.invalid_username)
                             usernameErrorTextView.visibility = View.VISIBLE
                         }
+
                         is RegisterUIState.PasswordError -> {
                             // Show password error
                             passwordErrorTextView.text =
                                 applicationContext.getString(R.string.invalid_password)
                             passwordErrorTextView.visibility = View.VISIBLE
                         }
+
                         is RegisterUIState.PasswordMismatchError -> {
                             // Show password mismatch error
                             confirmPasswordErrorTextView.text =
                                 applicationContext.getString(R.string.mismatched_passwords)
                             confirmPasswordErrorTextView.visibility = View.VISIBLE
                         }
+
                         RegisterUIState.UserExistsError -> {
                             Toast.makeText(
                                 this@RegisterActivity,
@@ -85,6 +91,7 @@ class RegisterActivity : AppCompatActivity() {
                                 Toast.LENGTH_LONG
                             ).show()
                         }
+
                         RegisterUIState.UnknownError -> {
                             // Show error message
                             Toast.makeText(
