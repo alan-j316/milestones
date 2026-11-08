@@ -231,9 +231,11 @@ class MilestoneRepository(
             // NOTE: Upsert logic is handled by the database so there is no need to check it here
             // Get the user logged-in user's id
             val currentUserId = sharedPref.currentUserId
+            Log.e("Update User Info", "UserID: $currentUserId")
             if (currentUserId < 0)  // There is no current user
                 return false
             val user = database.userDao.getUser(currentUserId)
+            Log.e("Update User Info", "User: $user")
             checkNotNull(user) { "User not logged in!" }
 
             return database.userDao.upsert(
@@ -282,8 +284,8 @@ class MilestoneRepository(
      */
     override suspend fun userHasGoalSet(userId: Long): Boolean {
         try {
-            val user = database.userDao.getUser(userId);
-            return if (user == null) false else user.goalWeight >= 0.0f
+            val user = database.userDao.getUser(userId)
+            return if (user == null) false else user.goalWeight > 0.0f
         } catch (e: Exception) {
             Log.e(
                 LogCategory.REPOSITORY,

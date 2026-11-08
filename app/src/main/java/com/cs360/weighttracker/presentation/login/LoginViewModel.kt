@@ -39,7 +39,7 @@ class LoginViewModel(private val repository: IMilestoneRepository) : ViewModel()
                         LoginStatus.USERNAME_ERROR -> _state.send(LoginUIState.UsernameError)
                         LoginStatus.PASSWORD_ERROR -> _state.send(LoginUIState.PasswordError)
                         LoginStatus.SUCCESS -> triggerLoginEvent()
-                        LoginStatus.UNKNOWN_FAILURE -> _state.send (LoginUIState.UnknownError )
+                        LoginStatus.UNKNOWN_FAILURE -> _state.send(LoginUIState.UnknownError)
                     }
                 }
             }
@@ -57,9 +57,10 @@ class LoginViewModel(private val repository: IMilestoneRepository) : ViewModel()
             if (repository.userHasGoalSet(user.userId)) {
                 _state.send(LoginUIState.LogInSuccess)
                 return
+            } else {
+                // If not trigger goal not set event
+                _state.send(LoginUIState.GoalNotSet)
             }
-            // If not trigger goal not set event
-            _state.send(LoginUIState.GoalNotSet)
         }
     }
 

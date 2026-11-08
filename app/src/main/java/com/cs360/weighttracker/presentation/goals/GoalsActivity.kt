@@ -96,10 +96,10 @@ class GoalsActivity : AppCompatActivity() {
                             }
                         }
 
-                        else -> {
+                        GoalsUIState.SaveError -> {
                             Toast.makeText(
                                 this@GoalsActivity,
-                                R.string.goal_update_error,
+                                R.string.goal_save_error,
                                 Toast.LENGTH_LONG
                             ).show()
                         }

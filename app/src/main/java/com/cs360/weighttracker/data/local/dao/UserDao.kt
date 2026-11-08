@@ -11,7 +11,7 @@ import com.cs360.weighttracker.data.local.models.UserEntity
 @Dao
 interface UserDao {
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsert(user: UserEntity): Long
 
     @Query("SELECT * FROM users WHERE id = :userId")

@@ -69,20 +69,19 @@ class GoalsViewModel(private val repository: IMilestoneRepository) : ViewModel()
         curWeight: Float,
         goalWeight: Float
     ): Boolean {
-        var isValid = true
         if (fullName.isEmpty()) {
             _state.update { GoalsUIState.FullNameError }
-            isValid = false
+            return false
         }
         if (!validate(curWeight)) {
             _state.update { GoalsUIState.CurrentWeightError }
-            isValid = false
+            return false
         }
         if (!validate(goalWeight)) {
             _state.update { GoalsUIState.GoalWeighError }
-            isValid = false
+            return false
         }
-        return isValid
+        return true
     }
 
 }
