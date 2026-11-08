@@ -180,6 +180,15 @@ class ProfileActivity : AppCompatActivity() {
                         // Set up the toggles for SMS preference
                         notificationSwitch.setOnCheckedChangeListener(null)
                         notificationSwitch.isChecked = pref
+                        notificationSwitch.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
+                            // Only ask permission for toggling it off
+                            if (isChecked) {
+                                handleSmsPermission() // Only ask if they are turning it ON
+                            } else {
+                                // User turned it OFF. Just update the setting to false.
+                                viewModel.onAction(ProfileActions.UpdateSMSSetting(false))
+                            }
+                        }
                     }
                 }
             }
@@ -220,16 +229,6 @@ class ProfileActivity : AppCompatActivity() {
         }
         updateProfileButton.setOnClickListener { _: View? ->
             navigateToGoals()
-        }
-
-        notificationSwitch.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
-            // Only ask permission for toggling it off
-            if (isChecked) {
-                handleSmsPermission() // Only ask if they are turning it ON
-            } else {
-                // User turned it OFF. Just update the setting to false.
-                viewModel.onAction(ProfileActions.UpdateSMSSetting(true))
-            }
         }
 
         updateNumberButton.setOnClickListener { _: View? ->
