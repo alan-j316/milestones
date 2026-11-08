@@ -80,7 +80,7 @@ class MilestoneRepository(
             }
             // Register the user and save the user session to shared pref
             val newUser = UserEntity(username, hashedPassword)
-            val userId = database.userDao.upsert(newUser)
+            val userId = database.userDao.insert(newUser)
 
             // If the insert was a success login in the user
             if (userId >= 0) {
@@ -133,7 +133,7 @@ class MilestoneRepository(
             checkNotNull(user) { "User not found!" }
 
             // Update the user if user is logged in.
-            return database.userDao.upsert(user.copy(fullName = fullName)) >= 0
+            return database.userDao.update(user.copy(fullName = fullName)) > 0
         } catch (e: Exception) {
             Log.e(LogCategory.REPOSITORY, "There was an updating the user!\n" + e.message)
         }
@@ -218,12 +218,12 @@ class MilestoneRepository(
             val user = database.userDao.getUser(currentUserId)
             checkNotNull(user) { "User not logged in!" }
 
-            return database.userDao.upsert(
+            return database.userDao.update(
                 user.copy(
                     currentWeight = currentWeight,
                     goalWeight = goalWeight
                 )
-            ) >= 0
+            ) > 0
         } catch (e: Exception) {
             Log.e(LogCategory.REPOSITORY, "There was error logging the user weight!\n" + e.message)
         }
@@ -244,13 +244,13 @@ class MilestoneRepository(
             val user = database.userDao.getUser(currentUserId)
             checkNotNull(user) { "User not logged in!" }
 
-            return database.userDao.upsert(
+            return database.userDao.update(
                 user.copy(
                     fullName = fullName,
                     currentWeight = currentWeight,
                     goalWeight = goalWeight
                 )
-            ) >= 0
+            ) > 0
         } catch (e: Exception) {
             Log.e(LogCategory.REPOSITORY, "There was error logging the user weight!\n" + e.message)
         }
@@ -340,7 +340,7 @@ class MilestoneRepository(
             if (currentUserId < 0)  // There is no current user
                 return false
             val currentUser = database.userDao.getUser(currentUserId) ?: return false
-            return database.userDao.upsert(currentUser.copy(phoneNumber = phoneNumber)) > -1
+            return database.userDao.update(currentUser.copy(phoneNumber = phoneNumber)) > 0
         } catch (e: Exception) {
             Log.e(
                 LogCategory.REPOSITORY,

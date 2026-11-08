@@ -5,15 +5,18 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.cs360.weighttracker.data.local.models.UserEntity
 import kotlinx.coroutines.flow.Flow
 
 
 @Dao
 interface UserDao {
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insert(user: UserEntity): Long
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun upsert(user: UserEntity): Long
+    @Update
+    suspend fun update(user: UserEntity): Int
 
     @Query("SELECT * FROM users WHERE id = :userId")
     suspend fun getUser(userId: Long): UserEntity?
