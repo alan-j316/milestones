@@ -3,6 +3,9 @@ package com.cs360.weighttracker.data.local
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 
 
 class MilestonesSharedPref(ctx: Context) {
@@ -26,17 +29,40 @@ class MilestonesSharedPref(ctx: Context) {
         ctx.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
     }
 
+
+//    var smsSetting: Boolean
+//        get() = sharedPreferences.getBoolean(SMS_SETTING_KEY, false)
+//        set(status) {
+//
+//        }
     /**
      * @brief A boolean flag indicating whether the user has SMS option turned ON or OFF
-     * @remarks The values are directly read and written to the shared preferences.
      */
-    var smsSetting: Boolean
-        get() = sharedPreferences.getBoolean(SMS_SETTING_KEY, false)
-        set(status) {
-            sharedPreferences.edit {
-                putBoolean(SMS_SETTING_KEY, status)
+    fun getSMSSetting(): Flow<Boolean> = callbackFlow {
+        // Send an initial value
+        trySend(sharedPreferences.getBoolean(SMS_SETTING_KEY, false))
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener { preferences, key ->
+            if (key == SMS_SETTING_KEY) {
+                trySend(preferences.getBoolean(key, false))
             }
         }
+        sharedPreferences.registerOnSharedPreferenceChangeListener(listener)
+
+        // Unregister listener
+        awaitClose {
+            sharedPreferences.unregisterOnSharedPreferenceChangeListener(listener)
+        }
+    }
+
+    /**
+     * Update the SMS setting for the user.
+     */
+    fun setSMSSetting(status: Boolean) {
+        sharedPreferences.edit {
+            putBoolean(SMS_SETTING_KEY, status)
+        }
+    }
+
 
     /**
      * Get/Set the current logged-in user's id.

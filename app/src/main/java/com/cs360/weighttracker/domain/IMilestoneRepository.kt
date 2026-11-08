@@ -15,11 +15,6 @@ interface IMilestoneRepository {
     val dailyWeights: Flow<List<DailyWeight>>
 
     /**
-     * The user's SMS notification setting.
-     */
-    var userNotificationSetting: Boolean
-
-    /**
      * Logs in the user with the given username and password.
      *
      * @param username The username of the user.
@@ -112,4 +107,11 @@ interface IMilestoneRepository {
      * @return A boolean indicating whether the operation was successful.
      */
     suspend fun setPhoneNumber(phoneNumber: String): Boolean
+
+    /**
+     * Set's the user's SMS preference.
+     */
+    suspend fun setSMSSetting(setting: Boolean)
+
+    fun getSMSSetting(): Flow<Boolean>
 }

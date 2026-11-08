@@ -31,6 +31,9 @@ class HomeViewModel(private val repository: IMilestoneRepository) : ViewModel() 
             return@combine UserData(user, weight)
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), initialValue = UserData())
 
+    var smsPreference = repository.getSMSSetting()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
 
     fun onAction(action: HomeActions) {
 
@@ -56,7 +59,7 @@ class HomeViewModel(private val repository: IMilestoneRepository) : ViewModel() 
                         // trigger the related event, and if not trigger weight added event.
                         val user = userData.value.user ?: return@launch
                         if (hasReachGoalWeight(action.weight, user)) {
-                            val shouldSendSms = repository.userNotificationSetting
+                            val shouldSendSms = smsPreference.value
                             _state.update {
                                 HomeUIState.GoalWeightReached(
                                     action.weight,

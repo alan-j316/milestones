@@ -96,6 +96,14 @@ class MilestoneRepository(
         return RegisterStatus.UNKNOWN_FAILURE
     }
 
+    override suspend fun setSMSSetting(setting: Boolean) {
+        sharedPref.setSMSSetting(setting)
+    }
+
+    override fun getSMSSetting(): Flow<Boolean> {
+        return sharedPref.getSMSSetting()
+    }
+
 
     /**
      * Logs out the current user.
@@ -142,12 +150,12 @@ class MilestoneRepository(
             // Get the user logged-in user's id
             val currentUserId = sharedPref.currentUserId
             if (currentUserId < 0)  // There is no current user
-                return flow {  }
+                return flow { }
             return database.userDao.getUserLatest(currentUserId).map { it?.toUser() }
         } catch (e: Exception) {
             Log.e(LogCategory.REPOSITORY, "There was an getting the user!\n" + e.message)
         }
-        return flow {  }
+        return flow { }
     }
 
 
@@ -341,14 +349,4 @@ class MilestoneRepository(
         }
         return false
     }
-
-
-    /**
-     * The user's SMS notification setting.
-     */
-    override var userNotificationSetting: Boolean
-        get() = sharedPref.smsSetting ?: false
-        set(value: Boolean) {
-            sharedPref.smsSetting = value
-        }
 }

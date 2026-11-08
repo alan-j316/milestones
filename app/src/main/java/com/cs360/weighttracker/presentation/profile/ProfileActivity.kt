@@ -57,23 +57,22 @@ class ProfileActivity : AppCompatActivity() {
         this.enableEdgeToEdge()
         setContentView(R.layout.activity_profile)
 
-        requestPermissionLauncher =
-            registerForActivityResult(
-                ActivityResultContracts.RequestPermission()
-            ) { isGranted: Boolean ->
-                if (isGranted) {
-                    handleUserNumberAndToggleSMSOn()
-                } else {
-                    // Revert the switch visually because they denied it
-                    notificationSwitch.isChecked = false
+        requestPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+                handleUserNumberAndToggleSMSOn()
+            } else {
+                // Revert the switch visually because they denied it
+                notificationSwitch.isChecked = false
 
-                    // If the user denied the permission and show rationale is false, it means they permanently blocked it.
-                    // in which case we display the dialog for opening setting and manually switching the permission
-                    if (!shouldShowRequestPermissionRationale(Manifest.permission.SEND_SMS)) {
-                        showSettingsRedirectDialog()
-                    }
+                // If the user denied the permission and show rationale is false, it means they permanently blocked it.
+                // in which case we display the dialog for opening setting and manually switching the permission
+                if (!shouldShowRequestPermissionRationale(Manifest.permission.SEND_SMS)) {
+                    showSettingsRedirectDialog()
                 }
             }
+        }
 
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -86,9 +85,7 @@ class ProfileActivity : AppCompatActivity() {
 
                             ProfileUIState.LogoutError -> {
                                 makeText(
-                                    this@ProfileActivity,
-                                    R.string.log_out_error,
-                                    Toast.LENGTH_SHORT
+                                    this@ProfileActivity, R.string.log_out_error, Toast.LENGTH_SHORT
                                 ).show()
                             }
 
@@ -150,9 +147,7 @@ class ProfileActivity : AppCompatActivity() {
                             val weightLost: Float = currentGoal - currentWeight
                             val goalTotal: Float = currentGoal - currentGoal
                             weightProgressTextView.text = getString(
-                                R.string.weight_loss_progress,
-                                weightLost,
-                                goalTotal
+                                R.string.weight_loss_progress, weightLost, goalTotal
                             )
                             val progressPercentage = (weightLost / goalTotal * 100).toInt()
                             val progress = max(0, min(100, progressPercentage))
@@ -163,9 +158,7 @@ class ProfileActivity : AppCompatActivity() {
                             val weightGained: Float = currentWeight - currentGoal
                             val goalTotal: Float = currentGoal - currentGoal
                             weightProgressTextView.text = getString(
-                                R.string.weight_gain_progress,
-                                weightGained,
-                                goalTotal
+                                R.string.weight_gain_progress, weightGained, goalTotal
                             )
 
                             val progressPercentage = (weightGained / goalTotal * 100).toInt()
@@ -181,14 +174,16 @@ class ProfileActivity : AppCompatActivity() {
 
                         // If the user has a phone number set, the update the number the textview with their number
                         if (user.phoneNumber.isNotEmpty()) numberTextView.text = getString(
-                            R.string.sms_number_text,
-                            user.phoneNumber
+                            R.string.sms_number_text, user.phoneNumber
                         )
+                    }
+                }
 
+                launch {
+                    viewModel.smsPreference.collect { pref ->
                         // Set up the toggles for SMS preference
-//                        notificationSwitch.setOnCheckedChangeListener(null)
-//                        notificationSwitch.isChecked = viewModel.smsPreference
-//
+                        notificationSwitch.setOnCheckedChangeListener(null)
+                        notificationSwitch.isChecked = pref
                     }
                 }
             }
@@ -254,8 +249,7 @@ class ProfileActivity : AppCompatActivity() {
         val permission = Manifest.permission.SEND_SMS
 
         if (ContextCompat.checkSelfPermission(
-                this,
-                permission
+                this, permission
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             handleUserNumberAndToggleSMSOn()
@@ -289,22 +283,19 @@ class ProfileActivity : AppCompatActivity() {
      * if the system allow the permission rationale(permission popup) to be shown.
      */
     private fun showRationaleDialog() {
-        androidx.appcompat.app.AlertDialog.Builder(this)
-            .setTitle(R.string.sms_permission_dialog_title)
-            .setMessage(R.string.sms_permission_body)
+        AlertDialog.Builder(this)
+            .setTitle(R.string.sms_permission_dialog_title).setMessage(R.string.sms_permission_body)
             .setPositiveButton(
                 R.string.ok
             ) { _: DialogInterface?, _: Int ->
                 // Request the system popup again
                 requestPermissionLauncher.launch(Manifest.permission.SEND_SMS)
-            }
-            .setNegativeButton(
+            }.setNegativeButton(
                 R.string.cancel
             ) { _: DialogInterface?, _: Int ->
                 // Toggle the switch to off since the user denied permission
                 notificationSwitch.isChecked = false
-            }
-            .show()
+            }.show()
     }
 
 
@@ -316,8 +307,7 @@ class ProfileActivity : AppCompatActivity() {
     private fun showAddPhoneDialog() {
         val user = viewModel.userData.value.user ?: return
 
-        val dialogView: View =
-            layoutInflater.inflate(R.layout.dialog_add_phone_number, null)
+        val dialogView: View = layoutInflater.inflate(R.layout.dialog_add_phone_number, null)
         val phoneNumberEditText: EditText =
             dialogView.findViewById(R.id.etAddPhoneNumberDialogNumber)
         val phoneNumberErrorTextView: TextView =
@@ -328,9 +318,7 @@ class ProfileActivity : AppCompatActivity() {
         val positiveActionTextRes: Int =
             if (user.phoneNumber.isEmpty()) R.string.add_number else R.string.update_number
 
-        AlertDialog.Builder(this)
-            .setTitle(R.string.add_phone_number)
-            .setView(dialogView)
+        AlertDialog.Builder(this).setTitle(R.string.add_phone_number).setView(dialogView)
             .setPositiveButton(
                 positiveActionTextRes
             ) { _: DialogInterface?, _: Int ->
@@ -346,8 +334,7 @@ class ProfileActivity : AppCompatActivity() {
                     viewModel.onAction(ProfileActions.UpdatePhone(phoneNumber))
                     viewModel.onAction(ProfileActions.UpdateSMSSetting(true))
                 }
-            }
-            .setNegativeButton(
+            }.setNegativeButton(
                 R.string.cancel
             ) { _: DialogInterface?, _: Int ->
                 // Toggle back the button if there is no phone number
@@ -355,8 +342,7 @@ class ProfileActivity : AppCompatActivity() {
                     notificationSwitch.isChecked = false
                     viewModel.onAction(ProfileActions.UpdateSMSSetting(false))
                 }
-            }
-            .show()
+            }.show()
 
         // Update the phone number text if the user updates the phone number
         phoneNumberEditText.doOnTextChanged { _, _, _, _ ->
@@ -370,22 +356,18 @@ class ProfileActivity : AppCompatActivity() {
      * Create a dialog to be displayed when the user permanently denies the permission.
      */
     private fun showSettingsRedirectDialog() {
-        AlertDialog.Builder(this)
-            .setTitle(R.string.permission_denied_permanently_title)
-            .setMessage(R.string.enable_permission_manually)
-            .setPositiveButton(
+        AlertDialog.Builder(this).setTitle(R.string.permission_denied_permanently_title)
+            .setMessage(R.string.enable_permission_manually).setPositiveButton(
                 R.string.go_to_settings
             ) { _: DialogInterface?, _: Int ->
                 // Take them to the settings screen
                 openAppSettings()
-            }
-            .setNegativeButton(
+            }.setNegativeButton(
                 R.string.cancel
             ) { _: DialogInterface?, _: Int ->
                 // Toggle the switch to off since the user denied permission
                 notificationSwitch.isChecked = false
-            }
-            .show()
+            }.show()
     }
 
 
@@ -416,8 +398,7 @@ class ProfileActivity : AppCompatActivity() {
     private fun navigateToGoals() {
         val intent = Intent(this, GoalsActivity::class.java)
         intent.putExtra(
-            com.cs360.weighttracker.presentation.Constants.GOAL_ACTIVITY_EDIT_FLAG,
-            true
+            com.cs360.weighttracker.presentation.Constants.GOAL_ACTIVITY_EDIT_FLAG, true
         )
         startActivity(intent)
     }
