@@ -6,14 +6,12 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.telephony.SmsManager
-import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
@@ -22,16 +20,15 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.RecyclerView
 import com.cs360.weighttracker.R
 import com.cs360.weighttracker.domain.models.GoalType
+import com.cs360.weighttracker.domain.models.User
 import com.cs360.weighttracker.presentation.Constants
-import com.cs360.weighttracker.presentation.profile.ProfileActivity
 import com.cs360.weighttracker.presentation.components.AddWeightDialog
 import com.cs360.weighttracker.presentation.components.DeleteWeightItemDialog
 import com.cs360.weighttracker.presentation.components.WeightItemAdapter
+import com.cs360.weighttracker.presentation.profile.ProfileActivity
 import com.cs360.weighttracker.presentation.utils.TimeUtils
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.lang.Exception
-import kotlin.jvm.java
 import kotlin.math.max
 import kotlin.math.min
 
@@ -99,7 +96,7 @@ class HomeActivity : AppCompatActivity() {
                                 }
 
 
-                                val user = viewModel.currentUser ?: return@collect
+                                val user = viewModel.userData.value.user ?: return@collect
                                 // Check if the user has granted permission
                                 // NOTE: We are not handling the permission here since if the user has their preference as off
                                 // or has manually turned off the permission, we can assume that they don't need the feature,
@@ -144,27 +141,6 @@ class HomeActivity : AppCompatActivity() {
                                 }
                             }
 
-                            is HomeUIState.InitialDataLoaded -> {
-                                val user = state.user
-                                fullNameTextView.text = user.fullName
-                                greetingTextView.setText(TimeUtils.greetingResId)
-                                startWeightTextView.text = getString(
-                                    R.string.weight_format, user.currentWeight
-                                )
-                                goalWeightTextView.text = getString(
-                                    R.string.weight_format, user.goalWeight
-                                )
-
-                                // Set up the progress in case the user loaded late
-                                val weight = viewModel.latestWeight.value
-                                val currentWeight = weight?.weight ?: user.currentWeight
-                                currentWeightTextView.text = getString(
-                                    R.string.weight_format, currentWeight
-                                )
-                                val progress = getProgress(weight?.weight)
-                                weightProgressBar.progress = progress
-                            }
-
                             HomeUIState.WeightDeleteError -> {
                                 Toast.makeText(
                                     this@HomeActivity,
@@ -183,15 +159,26 @@ class HomeActivity : AppCompatActivity() {
                 }
 
                 launch {
-                    viewModel.latestWeight.collect { weight ->
-                        val user = viewModel.currentUser ?: return@collect
+                    viewModel.userData.collect { (user, weight) ->
+                        if (user == null) return@collect
+                        // Update the user information if non-null
+                        fullNameTextView.text = user.fullName
+                        greetingTextView.setText(TimeUtils.greetingResId)
+                        startWeightTextView.text = getString(
+                            R.string.weight_format, user.currentWeight
+                        )
+                        goalWeightTextView.text = getString(
+                            R.string.weight_format, user.goalWeight
+                        )
+
+                        // Update the weight progress
                         // If the user has no goal weight set, then set the UserGoal's start weight as the current weight
                         val currentWeight = weight?.weight ?: user.currentWeight
                         currentWeightTextView.text = getString(
                             R.string.weight_format, currentWeight
                         )
                         // Update the progress
-                        val progress = getProgress(weight?.weight)
+                        val progress = getProgress(user, weight?.weight)
                         weightProgressBar.progress = progress
                     }
                 }
@@ -253,10 +240,8 @@ class HomeActivity : AppCompatActivity() {
      * @param weight The latest logged weight.
      * @return A number from 0 to 100 indicating the weight progress.
      */
-    private fun getProgress(weight: Float?): Int {
+    private fun getProgress(user: User, weight: Float?): Int {
         weight?.let {
-            val user = viewModel.currentUser ?: return@let 0;
-
             var progress: Int
             if (user.getGoalType() == GoalType.WEIGHT_LOSS) {
                 // Get current weight returns the user's initial weight,

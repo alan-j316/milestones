@@ -14,23 +14,6 @@ class GoalsViewModel(private val repository: IMilestoneRepository) : ViewModel()
     private var _state = MutableStateFlow<GoalsUIState>(GoalsUIState.IsLoading)
     val state = _state.asStateFlow()
 
-    init {
-        // Send an event to show the initial data if it exists.
-        viewModelScope.launch {
-            val currentUser = repository.getCurrentUser()
-            currentUser?.let { user ->
-                _state.update {
-                    GoalsUIState.InitialDataLoaded(
-                        user.fullName,
-                        user.currentWeight,
-                        user.goalWeight
-                    )
-                }
-            }
-        }
-    }
-
-
     fun onAction(action: GoalsActions) {
         when (action) {
             is GoalsActions.Save -> {

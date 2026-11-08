@@ -51,57 +51,59 @@ class GoalsActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.state.collect { state ->
-                    when (state) {
-                        GoalsUIState.CurrentWeightError -> {
-                            currentWeightErrorTextView.text =
-                                applicationContext.getString(R.string.current_weight_error)
-                            currentWeightErrorTextView.visibility = View.VISIBLE
-                        }
-
-                        GoalsUIState.FullNameError -> {
-                            fullNameErrorTextview.text =
-                                applicationContext.getString(R.string.full_name_empty_error)
-                            fullNameErrorTextview.visibility = View.VISIBLE
-                        }
-
-                        GoalsUIState.GoalWeighError -> {
-                            goalWeightErrorTextView.text =
-                                applicationContext.getString(R.string.goal_weight_error)
-                            goalWeightErrorTextView.visibility = View.VISIBLE
-                        }
-
-                        GoalsUIState.IsLoading -> {
-                            // TODO: Add loading state
-                        }
-
-                        GoalsUIState.SaveSuccess -> {
-                            // Navigate back
-                            if (isEditMode)
-                                finish()
-                            else navigateToHome()
-
-                        }
-
-                        is GoalsUIState.InitialDataLoaded -> {
-                            // Loaded the data in to UI
-                            if (state.fullName.isNotBlank()) {
-                                fullNameEditText.setText(state.fullName)
+                launch {
+                    viewModel.state.collect { state ->
+                        when (state) {
+                            GoalsUIState.CurrentWeightError -> {
+                                currentWeightErrorTextView.text =
+                                    applicationContext.getString(R.string.current_weight_error)
+                                currentWeightErrorTextView.visibility = View.VISIBLE
                             }
-                            if (state.goalWeight > 0.0) {
-                                goalWeightEditText.setText(state.goalWeight.toString())
-                            }
-                            if (state.currentWeight > 0.0) {
-                                currentWeightEditText.setText(state.currentWeight.toString())
-                            }
-                        }
 
-                        GoalsUIState.SaveError -> {
-                            Toast.makeText(
-                                this@GoalsActivity,
-                                R.string.goal_save_error,
-                                Toast.LENGTH_LONG
-                            ).show()
+                            GoalsUIState.FullNameError -> {
+                                fullNameErrorTextview.text =
+                                    applicationContext.getString(R.string.full_name_empty_error)
+                                fullNameErrorTextview.visibility = View.VISIBLE
+                            }
+
+                            GoalsUIState.GoalWeighError -> {
+                                goalWeightErrorTextView.text =
+                                    applicationContext.getString(R.string.goal_weight_error)
+                                goalWeightErrorTextView.visibility = View.VISIBLE
+                            }
+
+                            GoalsUIState.IsLoading -> {
+                                // TODO: Add loading state
+                            }
+
+                            GoalsUIState.SaveSuccess -> {
+                                // Navigate back
+                                if (isEditMode)
+                                    finish()
+                                else navigateToHome()
+
+                            }
+
+                            is GoalsUIState.InitialDataLoaded -> {
+                                // Loaded the data in to UI
+                                if (state.fullName.isNotBlank()) {
+                                    fullNameEditText.setText(state.fullName)
+                                }
+                                if (state.goalWeight > 0.0) {
+                                    goalWeightEditText.setText(state.goalWeight.toString())
+                                }
+                                if (state.currentWeight > 0.0) {
+                                    currentWeightEditText.setText(state.currentWeight.toString())
+                                }
+                            }
+
+                            GoalsUIState.SaveError -> {
+                                Toast.makeText(
+                                    this@GoalsActivity,
+                                    R.string.goal_save_error,
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
                         }
                     }
                 }

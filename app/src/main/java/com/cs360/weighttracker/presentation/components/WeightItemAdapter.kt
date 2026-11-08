@@ -1,16 +1,12 @@
 package com.cs360.weighttracker.presentation.components
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
 import com.cs360.weighttracker.domain.models.DailyWeight
 
 class WeightItemAdapter(
-//    private val dailyWeights: List<DailyWeight>,
-//    private val onDeleteWeightListener: WeightItemRemoveListener
     private val onWeightDelete: (id: Long) -> Unit
 ) : ListAdapter<DailyWeight, WeightItemViewHolder>(WeightItemDiffCallback()) {
 
@@ -23,25 +19,8 @@ class WeightItemAdapter(
         // Get the at the position index and bind it to the view holder
         val weight = getItem(position)
         holder.bind(weight, onWeightDelete)
-        // TODO: REMOVE
-//        holder.itemView.tag = weight.id
     }
 
-    // TODO: REMOVE
-//    /**
-//     * Update the recyclerview's data with new data and refresh the view.
-//     *
-//     * @param newWeights The weights to update with.
-//     */
-//    // TODO: Rework and remove warning
-//    @SuppressLint("NotifyDataSetChanged")
-//    fun updateData(newWeights: List<DailyWeight>) {
-//        // TODO: Update
-//        this.dailyWeights.clear()
-//        this.dailyWeights.addAll(newWeights)
-//        // Since we are removing and reintroducing all the item we need to call this to refresh the dataset.
-//        notifyDataSetChanged()
-//    }
 
 
     class WeightItemDiffCallback : DiffUtil.ItemCallback<DailyWeight>() {

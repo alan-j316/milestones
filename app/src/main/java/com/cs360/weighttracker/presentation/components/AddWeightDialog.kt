@@ -3,14 +3,12 @@ package com.cs360.weighttracker.presentation.components
 import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.viewModels
 import com.cs360.weighttracker.R
 import com.cs360.weighttracker.presentation.home.HomeActions
 import com.cs360.weighttracker.presentation.home.HomeViewModel

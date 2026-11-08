@@ -137,17 +137,17 @@ class MilestoneRepository(
      * Retrieves the current logged-in user
      * @return The logged-in user if one exists else null.
      */
-    override suspend fun getCurrentUser(): User? {
+    override fun getCurrentUser(): Flow<User?> {
         try {
             // Get the user logged-in user's id
             val currentUserId = sharedPref.currentUserId
             if (currentUserId < 0)  // There is no current user
-                return null
-            return database.userDao.getUser(currentUserId)?.toUser()
+                return flow {  }
+            return database.userDao.getUserLatest(currentUserId).map { it?.toUser() }
         } catch (e: Exception) {
             Log.e(LogCategory.REPOSITORY, "There was an getting the user!\n" + e.message)
         }
-        return null
+        return flow {  }
     }
 
 

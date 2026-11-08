@@ -12,16 +12,15 @@ import android.widget.CompoundButton
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ProgressBar
+import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
 import android.widget.Toast.makeText
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.SwitchCompat
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.Lifecycle
@@ -42,7 +41,7 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var numberTextView: TextView
     private lateinit var weightChangeProgressBar: ProgressBar
 
-    private lateinit var notificationSwitch: SwitchCompat
+    private lateinit var notificationSwitch: Switch
     private lateinit var updateProfileButton: Button
     private lateinit var logoutButton: Button
     private lateinit var updateNumberButton: Button
@@ -78,101 +77,122 @@ class ProfileActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.state.collect { state ->
-                    when (state) {
-                        ProfileUIState.IsLoading -> {
-                            // TODO: Add loading state
+                launch {
+                    viewModel.state.collect { state ->
+                        when (state) {
+                            ProfileUIState.IsLoading -> {
+                                // TODO: Add loading state
+                            }
+
+                            ProfileUIState.LogoutError -> {
+                                makeText(
+                                    this@ProfileActivity,
+                                    R.string.log_out_error,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+
+                            ProfileUIState.LogoutSuccess -> {
+                                makeText(
+                                    this@ProfileActivity,
+                                    R.string.log_out_success,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                navigateToLogin()
+                            }
+
+                            ProfileUIState.UpdateNumberError -> {
+                                makeText(
+                                    this@ProfileActivity,
+                                    R.string.phone_number_update_error,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+
+                            ProfileUIState.UpdateNumberSuccess -> {
+                                makeText(
+                                    this@ProfileActivity,
+                                    R.string.phone_number_update_success,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+
+                            ProfileUIState.UpdateSMSSettingError -> {
+                                makeText(
+                                    this@ProfileActivity,
+                                    R.string.sms_pref_update_error,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+
+                            ProfileUIState.UpdateSMSSettingSuccess -> {
+                                makeText(
+                                    this@ProfileActivity,
+                                    R.string.sms_pref_update_success,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    }
+                }
+
+                launch {
+                    viewModel.userData.collect { (user, weight) ->
+                        if (user == null) return@collect
+
+                        val currentGoal = user.goalWeight
+                        // If the user has not logged weight use the initial weight as the current weight
+                        val currentWeight: Float = weight?.weight ?: currentGoal
+
+                        if (user.getGoalType() === GoalType.WEIGHT_LOSS) {
+                            // Get current weight returns the user's initial weight,
+                            // and we compare it the user's logged weight to get the progress
+                            val weightLost: Float = currentGoal - currentWeight
+                            val goalTotal: Float = currentGoal - currentGoal
+                            weightProgressTextView.text = getString(
+                                R.string.weight_loss_progress,
+                                weightLost,
+                                goalTotal
+                            )
+                            val progressPercentage = (weightLost / goalTotal * 100).toInt()
+                            val progress = max(0, min(100, progressPercentage))
+                            weightChangeProgressBar.progress = progress
+                        } else {
+                            // For weight gain the current weight will be greater than the initial weight
+                            // else the progress will show negative values.
+                            val weightGained: Float = currentWeight - currentGoal
+                            val goalTotal: Float = currentGoal - currentGoal
+                            weightProgressTextView.text = getString(
+                                R.string.weight_gain_progress,
+                                weightGained,
+                                goalTotal
+                            )
+
+                            val progressPercentage = (weightGained / goalTotal * 100).toInt()
+                            val progress = max(0, min(100, progressPercentage))
+                            weightChangeProgressBar.progress = progress
                         }
 
-                        ProfileUIState.LogoutError -> {
-                            makeText(
-                                this@ProfileActivity,
-                                R.string.log_out_error,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
+                        // Update user information
+                        val fullNameTextView: TextView = findViewById(R.id.tvProfileFullName)
+                        // If the user has no full name, then use their username(This is highly unlikely).
+                        val fullName = if (user.fullName.isEmpty()) user.fullName else user.userName
+                        fullNameTextView.text = fullName
 
-                        ProfileUIState.LogoutSuccess -> {
-                            makeText(
-                                this@ProfileActivity,
-                                R.string.log_out_success,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            navigateToLogin()
-                        }
+                        // If the user has a phone number set, the update the number the textview with their number
+                        if (user.phoneNumber.isNotEmpty()) numberTextView.text = getString(
+                            R.string.sms_number_text,
+                            user.phoneNumber
+                        )
 
-                        ProfileUIState.UpdateNumberError -> {
-                            makeText(
-                                this@ProfileActivity,
-                                R.string.phone_number_update_error,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-
-                        ProfileUIState.UpdateNumberSuccess -> {
-                            makeText(
-                                this@ProfileActivity,
-                                R.string.phone_number_update_success,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-
-                        ProfileUIState.UpdateSMSSettingError -> {
-                            makeText(
-                                this@ProfileActivity,
-                                R.string.sms_pref_update_error,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-
-                        ProfileUIState.UpdateSMSSettingSuccess -> {
-                            makeText(
-                                this@ProfileActivity,
-                                R.string.sms_pref_update_success,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
+                        // Set up the toggles for SMS preference
+//                        notificationSwitch.setOnCheckedChangeListener(null)
+//                        notificationSwitch.isChecked = viewModel.smsPreference
+//
                     }
                 }
             }
 
-            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.latestWeight.collect { weight ->
-                    val currentGoal = viewModel.currentUser.goalWeight
-                    val user = viewModel.currentUser
-                    // If the user has not logged weight use the initial weight as the current weight
-                    val currentWeight: Float = weight?.weight ?: currentGoal
-
-                    if (user.getGoalType() === GoalType.WEIGHT_LOSS) {
-                        // Get current weight returns the user's initial weight,
-                        // and we compare it the user's logged weight to get the progress
-                        val weightLost: Float = currentGoal - currentWeight
-                        val goalTotal: Float = currentGoal - currentGoal
-                        weightProgressTextView.text = getString(
-                            R.string.weight_loss_progress,
-                            weightLost,
-                            goalTotal
-                        )
-                        val progressPercentage = (weightLost / goalTotal * 100).toInt()
-                        val progress = max(0, min(100, progressPercentage))
-                        weightChangeProgressBar.progress = progress
-                    } else {
-                        // For weight gain the current weight will be greater than the initial weight
-                        // else the progress will show negative values.
-                        val weightGained: Float = currentWeight - currentGoal
-                        val goalTotal: Float = currentGoal - currentGoal
-                        weightProgressTextView.text = getString(
-                            R.string.weight_gain_progress,
-                            weightGained,
-                            goalTotal
-                        )
-
-                        val progressPercentage = (weightGained / goalTotal * 100).toInt()
-                        val progress = max(0, min(100, progressPercentage))
-                        weightChangeProgressBar.progress = progress
-                    }
-                }
-            }
         }
 
         setupUI()
@@ -192,29 +212,8 @@ class ProfileActivity : AppCompatActivity() {
         notificationSwitch = findViewById(R.id.switchProfileNotificationSetting)
         numberTextView = findViewById(R.id.tvProfileNotificationNumber)
         updateNumberButton = findViewById(R.id.btnProfileUpdateNumber)
-
-        // Setup UI Text
-        prefillUI();
-
-//        // Update progress
-//        updateProgress()
     }
 
-    private fun prefillUI() {
-        val fullNameTextView: TextView = findViewById(R.id.tvProfileFullName)
-        // If the user has no full name, then use their username(This is highly unlikely).
-        var fullName = viewModel.currentUser.fullName
-        fullName = if (!fullName.isEmpty()) fullName else viewModel.currentUser.userName
-        fullNameTextView.text = fullName
-
-        // If the user has a phone number set, the update the number the textview with their number
-        if (!viewModel.currentUser.phoneNumber.isEmpty()) numberTextView.text = getString(
-            R.string.sms_number_text,
-            viewModel.currentUser.phoneNumber
-        )
-        // Update the notification setting
-        notificationSwitch.isChecked = viewModel.smsPreference
-    }
 
     /**
      * Sets up the event listeners necessary for all the views.
@@ -222,8 +221,6 @@ class ProfileActivity : AppCompatActivity() {
     private fun setupEvents() {
         logoutButton.setOnClickListener { _: View ->
             viewModel.onAction(ProfileActions.Logout)
-            // TODO: Move to logout success event
-//            navigateToLogin()
         }
 
         // Navigate back by popping out the current activity
@@ -276,9 +273,10 @@ class ProfileActivity : AppCompatActivity() {
      * Handles the user's SMS preference and toggles sms setting accordingly
      */
     private fun handleUserNumberAndToggleSMSOn() {
+        val user = viewModel.userData.value.user ?: return
         // Check if user has a phone number
         // if they don't have, request for a phone number
-        if (viewModel.currentUser.phoneNumber.isEmpty()) {
+        if (user.phoneNumber.isEmpty()) {
             showAddPhoneDialog() // Show the dialog
         } else { // If we have permission and user has phone number, turn it on!
             viewModel.onAction(ProfileActions.UpdateSMSSetting(true))
@@ -316,6 +314,8 @@ class ProfileActivity : AppCompatActivity() {
      * rather than refactoring out.
      */
     private fun showAddPhoneDialog() {
+        val user = viewModel.userData.value.user ?: return
+
         val dialogView: View =
             layoutInflater.inflate(R.layout.dialog_add_phone_number, null)
         val phoneNumberEditText: EditText =
@@ -324,9 +324,9 @@ class ProfileActivity : AppCompatActivity() {
             dialogView.findViewById(R.id.tvAddPhoneNumberDialogNumberError)
 
         // If the user already has a phone number update the edit text with it
-        phoneNumberEditText.setText(viewModel.currentUser.phoneNumber)
+        phoneNumberEditText.setText(user.phoneNumber)
         val positiveActionTextRes: Int =
-            if (viewModel.currentUser.phoneNumber.isEmpty()) R.string.add_number else R.string.update_number
+            if (user.phoneNumber.isEmpty()) R.string.add_number else R.string.update_number
 
         AlertDialog.Builder(this)
             .setTitle(R.string.add_phone_number)
@@ -345,22 +345,13 @@ class ProfileActivity : AppCompatActivity() {
                 } else {
                     viewModel.onAction(ProfileActions.UpdatePhone(phoneNumber))
                     viewModel.onAction(ProfileActions.UpdateSMSSetting(true))
-                    // If validation passes, set the user's phone number
-//                    if (repository.setPhoneNumber(phoneNumber)) {
-//                        // Update the current user's phone number
-//                        viewModel.currentUser = repository.getviewModel.currentUser()
-//                        toggleSMSSetting(true)
-//                        // Update the UI manually since our state is not reactive
-//                        prefillUI()
-
-//                    }
                 }
             }
             .setNegativeButton(
                 R.string.cancel
             ) { _: DialogInterface?, _: Int ->
                 // Toggle back the button if there is no phone number
-                if (viewModel.currentUser.phoneNumber.isEmpty()) {
+                if (user.phoneNumber.isEmpty()) {
                     notificationSwitch.isChecked = false
                     viewModel.onAction(ProfileActions.UpdateSMSSetting(false))
                 }
@@ -407,10 +398,6 @@ class ProfileActivity : AppCompatActivity() {
         intent.data = uri
         startActivity(intent)
     }
-
-//    private fun toggleSMSSetting(setting: kotlin.Boolean) {
-//        repository.setUserNotificationSetting(setting)
-//    }
 
 
     /**

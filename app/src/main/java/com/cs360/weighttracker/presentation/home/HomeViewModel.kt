@@ -5,10 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.cs360.weighttracker.domain.IMilestoneRepository
 import com.cs360.weighttracker.domain.models.GoalType
 import com.cs360.weighttracker.domain.models.User
+import com.cs360.weighttracker.presentation.shared.UserData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -18,13 +19,6 @@ class HomeViewModel(private val repository: IMilestoneRepository) : ViewModel() 
     private var _state = MutableStateFlow<HomeUIState>(HomeUIState.IsLoading)
     val state = _state.asStateFlow()
 
-    // Latest Weight
-    val latestWeight = repository.getLatestLoggedWeight().stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = null
-    )
-
     // Daily Weights Flow State
     val dailyWeights = repository.dailyWeights.stateIn(
         scope = viewModelScope,
@@ -32,20 +26,10 @@ class HomeViewModel(private val repository: IMilestoneRepository) : ViewModel() 
         initialValue = emptyList()
     )
 
-    var currentUser: User? = null
-        private set
-
-    init {
-        viewModelScope.launch {
-            // At this point current user must not be null
-            // and if it is null, user has either logged out in which case
-            // it is an invalid state or there was some hardware error or exception
-            val user = repository.getCurrentUser()!!
-            currentUser = user
-
-            _state.update { HomeUIState.InitialDataLoaded(user) }
-        }
-    }
+    val userData =
+        combine(repository.getLatestLoggedWeight(), repository.getCurrentUser()) { weight, user ->
+            return@combine UserData(user, weight)
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), initialValue = UserData())
 
 
     fun onAction(action: HomeActions) {
@@ -70,7 +54,8 @@ class HomeViewModel(private val repository: IMilestoneRepository) : ViewModel() 
                     if (weightLogged) {
                         // Check whether the goal weight was achieved. If so,
                         // trigger the related event, and if not trigger weight added event.
-                        if (hasReachGoalWeight(action.weight)) {
+                        val user = userData.value.user ?: return@launch
+                        if (hasReachGoalWeight(action.weight, user)) {
                             val shouldSendSms = repository.userNotificationSetting
                             _state.update {
                                 HomeUIState.GoalWeightReached(
@@ -97,18 +82,14 @@ class HomeViewModel(private val repository: IMilestoneRepository) : ViewModel() 
      * @return True if the user has reached their goal weight.
      * @return False otherwise.
      */
-    private fun hasReachGoalWeight(newWeight: Float): Boolean {
-        currentUser?.let { user ->
-            val weightGoal: Float = user.goalWeight
-            // In case of weight gain we need to check if current logged weight is greater or equal to
-            // the goal weight and weight loss if the logged weight is less than or equal
-            return if (user.getGoalType() === GoalType.WEIGHT_GAIN) {
-                newWeight >= weightGoal
-            } else {
-                newWeight <= weightGoal
-            }
+    private fun hasReachGoalWeight(newWeight: Float, user: User): Boolean {
+        val weightGoal: Float = user.goalWeight
+        // In case of weight gain we need to check if current logged weight is greater or equal to
+        // the goal weight and weight loss if the logged weight is less than or equal
+        return if (user.getGoalType() === GoalType.WEIGHT_GAIN) {
+            newWeight >= weightGoal
+        } else {
+            newWeight <= weightGoal
         }
-        return false // Return false if user is null(loading phase)
     }
-
 }

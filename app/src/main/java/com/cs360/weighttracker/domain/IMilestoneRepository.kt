@@ -54,7 +54,7 @@ interface IMilestoneRepository {
      * Retrieves the current logged-in user
      * @return The logged-in user if one exists else null.
      */
-    suspend fun getCurrentUser(): User?
+    fun getCurrentUser(): Flow<User?>
 
     /**
      * Logs the user's daily weight.

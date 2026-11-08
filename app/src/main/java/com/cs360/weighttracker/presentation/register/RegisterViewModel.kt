@@ -7,11 +7,7 @@ import com.cs360.weighttracker.domain.status.RegisterStatus
 import com.cs360.weighttracker.presentation.validators.PasswordValidator
 import com.cs360.weighttracker.presentation.validators.UsernameValidator
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class RegisterViewModel(private val repository: IMilestoneRepository) : ViewModel() {
