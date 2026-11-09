@@ -16,16 +16,6 @@ data class User(
 ) {
 
     /**
-     * Returns whether this user has a full name.
-     */
-    fun hasFullName(): Boolean = fullName.isNotBlank();
-
-    /**
-     * Returns whether this user has a phone number.
-     */
-    fun hasPhoneNumber(): Boolean = phoneNumber.isNotBlank();
-
-    /**
      * Returns user goals given the current goal and target weights.
      */
     fun getGoalType(): GoalType {

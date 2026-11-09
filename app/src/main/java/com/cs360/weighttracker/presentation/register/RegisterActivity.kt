@@ -134,7 +134,7 @@ class RegisterActivity : AppCompatActivity() {
             findViewById(R.id.btnAuthConfirmPasswordVisibility)
         loadingLayout = findViewById(R.id.loadingAuthLayout)
 
-        // Since we are reusing the layout for login and register, we need to unhide the confirm password field
+        // Since we are reusing the layout for login and register, we need to unhide the confirm-password field
         // Since the layout is not further manipulated or queried, local variable is sufficient here
         val confirmPasswordLayout = findViewById<LinearLayout>(R.id.layoutAuthConfirmPassword)
         confirmPasswordLayout.visibility = View.VISIBLE

@@ -28,7 +28,7 @@ internal fun getProgress(user: User, weight: Float?): Int {
             val goalTotal: Float = user.goalWeight - user.currentWeight
 
             val progressPercentage = (weightGained / goalTotal * 100).toInt()
-            progress = kotlin.math.max(0, kotlin.math.min(100, progressPercentage))
+            progress = max(0, min(100, progressPercentage))
         }
         return progress
     }
