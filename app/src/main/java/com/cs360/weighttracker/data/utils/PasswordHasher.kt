@@ -11,7 +11,6 @@ object PasswordHasher {
      * @param plainText The plain text string to hash.
      * @return The hashed string.
      */
-    @JvmStatic
     fun hash(plainText: String): String {
         val hashString = StringBuilder()
         try {

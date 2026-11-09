@@ -13,7 +13,6 @@ object PasswordVisibilityToggler {
      * @param visibilityButton The ImageButton that toggle the visibility.
      * @implNote Uses the passed-in edittext's internal state to toggle visibility.
      */
-    @JvmStatic
     fun togglePasswordState(passwordEditText: EditText, visibilityButton: ImageButton) {
         // Check if the password is visible
         val variation = passwordEditText.inputType and InputType.TYPE_MASK_VARIATION

@@ -7,7 +7,6 @@ object PhoneNumberValidator {
      * @param phoneNumber The phone number to validate.
      * @return A boolean indicating whether the phone number is valid.
      */
-    @JvmStatic
     fun validate(phoneNumber: String): Boolean {
         return !phoneNumber.trim { it <= ' ' }.isEmpty() && phoneNumber.length <= 20
     }

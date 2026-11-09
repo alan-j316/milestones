@@ -5,7 +5,6 @@ import com.cs360.weighttracker.R
 import java.util.Calendar
 
 object TimeUtils {
-    @JvmStatic
     @get:StringRes
     val greetingResId: Int
         /**

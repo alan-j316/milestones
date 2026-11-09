@@ -10,7 +10,6 @@ object WeightValidator {
      * @param weight The weight to validate.
      * @return Boolean indicating whether the weight is valid.
      */
-    @JvmStatic
     fun validate(weight: Float): Boolean {
         return weight in MIN_WEIGHT..MAX_WEIGHT
     }

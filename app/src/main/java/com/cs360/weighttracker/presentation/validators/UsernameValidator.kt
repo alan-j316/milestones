@@ -8,7 +8,6 @@ object UsernameValidator {
      * @param username The username to validate.
      * @return Boolean indicating whether the username is valid.
      */
-    @JvmStatic
     fun validate(username: String?): Boolean {
         if (username == null || username.trim { it <= ' ' }.isEmpty()) {
             return false

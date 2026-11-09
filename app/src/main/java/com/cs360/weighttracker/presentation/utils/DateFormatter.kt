@@ -11,7 +11,6 @@ object DateFormatter {
      * @param millis Time in milliseconds
      * @return A string representation of the target datetime.
      */
-    @JvmStatic
     fun fromMillis(millis: Long): String {
         val date = Date(millis)
         val formatter = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())

@@ -9,7 +9,6 @@ object WeightFormatter {
      * @param weight The weight to format.
      * @return A string representing the formatted weight.
      */
-    @JvmStatic
     @SuppressLint("DefaultLocale")
     fun format(weight: Float): String {
         val formatString = "%02.02f KG"

@@ -10,7 +10,6 @@ object PasswordValidator {
      * @param password The password to validate.
      * @return Boolean indicating whether the password is valid.
      */
-    @JvmStatic
     fun validate(password: String?): Boolean {
         if (password == null || password.trim { it <= ' ' }.isEmpty()) {
             return false
