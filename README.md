@@ -27,7 +27,7 @@ messages when users reach their goals.
 3. Open the project and run
 4. Alternatively, you can download the APK from the releases section.
 
-**Make sure you have Android Studio Panda 4 | 2025.3.4 or later as this project uses AGP 9.2.1**
+**Make sure you have Android Studio Quail | 2026.1.2 or later as this project uses AGP 9.3.3**
 
 ## Details
 
